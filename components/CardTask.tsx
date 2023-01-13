@@ -1,15 +1,42 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { PB } from '../utils'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPen } from '@fortawesome/free-solid-svg-icons'
 
-function CardTask() {
+interface Props {
+    Task:any
+}
+
+function CardTask({Task}:Props) {
+
+    const [Url, setUrl] = useState("")
+
+    const queryImage = async () => {
+        const records: any = await PB.collection('archivos').getFullList(200, {
+            sort:'-created',
+            filter: `tarea="${Task.id}"`
+          })
+
+          setUrl(`http://127.0.0.1:8090/api/files/zfny7t9q5gb37yj/${Task.archivos}/${records[0].archivo}`)
+       
+    }
+
+    useEffect(() => {
+      if(Task.archivos){
+        queryImage()
+      }
+    }, [])
+    
     return (
         <div className="card card-compact w-full bg-base-100 shadow-xl">
-            <figure><img src="https://placeimg.com/400/225/arch" alt="Shoes" /></figure>
+            <figure>{Url && <img src={Url} />}</figure>
             <div className="card-body">
-                <div className="card-actions justify-between">
-                    <h2 className="card-title">Shoes!</h2>
-                    <button className="btn btn-sm btn-primary">Buy Now</button>
+                <div className='text-base'>{Task.descripcion}</div>
+                <div className="card-actions justify-end">
+                    
+                    <button className="btn btn-sm btn-primary"><FontAwesomeIcon icon={faPen}  size={'xl'}/></button>
+                    
                 </div>
-                <p>If a dog chews shoes whose shoes does he choose?</p>
             </div>
         </div>
     )

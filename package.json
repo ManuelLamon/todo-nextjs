@@ -9,6 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.2.1",
+    "@fortawesome/fontawesome-svg-core": "^6.2.1",
+    "@fortawesome/free-regular-svg-icons": "^6.2.1",
+    "@fortawesome/free-solid-svg-icons": "^6.2.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@next/font": "13.1.1",
     "@tailwindcss/forms": "^0.5.3",
     "@types/node": "18.11.18",
@@ -21,10 +26,12 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.41.3",
+    "react-sortablejs": "^6.1.4",
     "sortablejs": "^1.15.0",
     "typescript": "4.9.4"
   },
   "devDependencies": {
+    "@types/sortablejs": "^1.15.0",
     "autoprefixer": "^10.4.13",
     "daisyui": "^2.46.1",
     "postcss": "^8.4.20",
