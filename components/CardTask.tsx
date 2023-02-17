@@ -5,6 +5,7 @@ import { faPen } from '@fortawesome/free-solid-svg-icons'
 
 interface Props {
     Task:any
+    taskIndex:number
 }
 
 function CardTask({Task}:Props) {
@@ -17,7 +18,7 @@ function CardTask({Task}:Props) {
             filter: `tarea="${Task.id}"`
           })
 
-          setUrl(`http://127.0.0.1:8090/api/files/zfny7t9q5gb37yj/${Task.archivos}/${records[0].archivo}`)
+          setUrl(`${process.env.API}/api/files/zfny7t9q5gb37yj/${Task.archivos}/${records[0].archivo}`)
        
     }
 
@@ -28,7 +29,7 @@ function CardTask({Task}:Props) {
     }, [])
     
     return (
-        <div className="card card-compact w-full bg-base-100 shadow-xl">
+        <div className="card card-compact w-full bg-base-100 shadow-xl mb-3">
             <figure>{Url && <img src={Url} />}</figure>
             <div className="card-body">
                 <div className='text-base'>{Task.descripcion}</div>

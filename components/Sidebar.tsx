@@ -1,6 +1,7 @@
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faSignOut } from '@fortawesome/free-solid-svg-icons'
+import Link from 'next/link'
 
 export default function Sidebar() {
   return (
@@ -31,8 +32,8 @@ export default function Sidebar() {
 
               <ul className="space-y-1 border-t border-gray-100 pt-4">
                 <li>
-                  <a
-                    href=""
+                  <Link 
+                    href="/proyectos"
                     className="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <FontAwesomeIcon icon={faUsers}  size={'1x'}/>
@@ -42,7 +43,7 @@ export default function Sidebar() {
                     >
                       Teams 
                     </span>
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </nav>
