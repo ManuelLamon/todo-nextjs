@@ -1,3 +1,16 @@
+export interface ProyectoContextProps {
+    List: List[] ;
+    setList: (e:List[]) => void;
+    TaskList: Task[];
+    setTaskList:(e:Task[]) => void;
+    Tasks: Tasks ;
+    setTasks:(e:Tasks) => void;
+}
+
+export interface Tasks {
+    [key: string]:any[]
+}
+
 export interface Task {
     id:                  string;
     collectionId:        string;
@@ -12,7 +25,7 @@ export interface Task {
     usuario_responsable: string;
     lista:               string;
     fecha_fin:           Date;
-    index:               string | number;
+    index:               string |number;
     proyecto:            string;
 }
 
@@ -24,6 +37,5 @@ export interface List {
     updated:        Date;
     nombre:         string;
     proyecto:       string;
-    index:          string;
+    index:          string | number;
 }
-

@@ -5,7 +5,6 @@ import { faPen } from '@fortawesome/free-solid-svg-icons'
 
 interface Props {
     Task:any
-    taskIndex:number
 }
 
 function CardTask({Task}:Props) {

@@ -1,63 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { PB } from "../utils";
 import CardTask from "./CardTask";
 import { ReactSortable } from "react-sortablejs";
 import { Task } from "../interfaces/tasks";
+import { proyectosContext } from "../context/proyectos/proyectosContext";
 
 interface Props {
   title?: string;
   data: any;
   setTaskSelect: any;
+  id:any;
 }
 
-function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
-  const [Tasks, setTasks] = useState<Task[]>([]);
+function ListTask({ title = "TODO", data, setTaskSelect,id }: Props) {
+  /* const [Tasks, setTasks] = useState<Task[]>([]); */
+  const { Tasks,setTasks } = useContext(proyectosContext);
 
-  const QueryTask = async () => {
+  const [TaskCopy, setTaskCopy] = useState<Task[]>([])
+
+/*   const QueryTask = async () => {
     const records: any = await PB.collection("tareas").getFullList(200, {
       sort: "index",
       filter: `lista="${data.id}"`,
     });
 
-    setTasks(records);
-    console.log(records);
-  };
+  }; */
 
   const onChangeData = (newState: any) => {
-    setTasks(newState);
+    setTaskCopy(newState)
   };
-
-  const updateChange = (e: any) => {
-    console.log(e.item.id);
-    console.log(Tasks);
-    console.log(e);
-    setTaskSelect(e.item.id,e)
-  };
-
-  const sub = () => {
-    PB.collection("tareas").subscribe("*", function (e) {
-      console.log(e);
-    })
-  } 
-  const unsubs = () => {
-    PB.collection("tareas").unsubscribe()
-  }
 
   useEffect(() => {
-    QueryTask();
-    
-    sub()
-    
-    return () => {
-      unsubs()
-    };
-
+    /* QueryTask(); */
+    setTaskCopy(Tasks[id])
   }, []);
 
+  useEffect(() => {
+    if(TaskCopy){
+      setTasks({...Tasks, [id]:TaskCopy})
+      console.log({...Tasks, [id]:TaskCopy})
+    }
+  }, [TaskCopy]);
+
   return (
-    <div className="flex overflow-x-hidden h-5/6 w-64 gap-3 flex-col items-center p-3 card bg-secondary ">
+    <div className="flex overflow-x-hidden h-5/6 w-64 gap-3 flex-col items-center p-3 card bg-secondary " id={id}>
       <div className="w-full flex justify-between flex-row items-center z-10 sticky top-0 card bg-slate-100 pl-3">
         <h1 className="font-bold">{title}</h1>
         <div className="dropdown dropdown-end">
@@ -76,7 +64,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
       </div>
       <ReactSortable
         id={data.id}
-        list={Tasks}
+        list={TaskCopy}
         setList={onChangeData}
         animation={200}
         easing="ease-out"
@@ -84,9 +72,9 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
         group={ {name:"shared"}}
         onChange={(e: any) => setTaskSelect(e.item.id,e)}
       >
-        {Tasks.map((task: Task, taskIndex) => (
+        {TaskCopy && TaskCopy.map((task: Task) => (
           <div id={task.id}>
-            <CardTask Task={task} taskIndex={taskIndex} key={task.id} />
+            <CardTask Task={task} key={task.id} />
           </div>
         ))}
       </ReactSortable>
