@@ -1,6 +1,6 @@
 import Image from 'next/image'
-import React, { useState } from 'react'
-import { useSesion } from '../../context/sesion/sesionContext'
+import React, { useContext, useState } from 'react'
+import { sesionContext, useSesion } from '../../context/sesion/sesionContext'
 import { useForm } from 'react-hook-form'
 import { PB } from '../../utils'
 import HeadCustom from '../../components/HeadCustom'
@@ -9,7 +9,7 @@ type Form = "Login" | "Register"
 
 function Login() {
 
-    const { sesion, setSesion } = useSesion()
+    const {setSesion} = useContext(sesionContext)
     const [TypeForm, setTypeForm] = useState<Form>("Login")
     const { register, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {

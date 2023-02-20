@@ -5,7 +5,7 @@ const nextConfig = {
   },
   reactStrictMode: false,
   env: {
-    API: 'http://127.0.0.1:9000',
+    API: 'http://127.0.0.1:8090',
   },
 }
 

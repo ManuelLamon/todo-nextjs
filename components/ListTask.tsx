@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { PB } from "../utils";
 import CardTask from "./CardTask";
-import { ReactSortable } from "react-sortablejs";
+import { ReactSortable, Sortable} from "react-sortablejs";
 import { Task } from "../interfaces/tasks";
 
 interface Props {
@@ -16,29 +16,36 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
   const [Tasks, setTasks] = useState<Task[]>([]);
 
   const QueryTask = async () => {
-    const records: any = await PB.collection("tareas").getFullList(200, {
+    const records: any[] = await PB.collection("tareas").getFullList(200, {
       sort: "index",
       filter: `lista="${data.id}"`,
     });
 
-    setTasks(records);
+    setTasks(records); 
     console.log(records);
   };
 
   const onChangeData = (newState: any) => {
+    console.log(newState)
     setTasks(newState);
-  };
-
-  const updateChange = (e: any) => {
-    console.log(e.item.id);
-    console.log(Tasks);
-    console.log(e);
-    setTaskSelect(e.item.id,e)
   };
 
   const sub = () => {
     PB.collection("tareas").subscribe("*", function (e) {
-      console.log(e);
+      const elemen = e.record as any 
+      console.log(e.record.index);
+      let prueba:Task[] = [];
+      if(e.record.lista === data.id){ 
+        prueba = [...Tasks].splice(e.record.index,0,elemen)
+        console.log(Tasks,'aqui')
+        /* setTasks(prueba) */
+      }else{
+        const ele = Tasks.findIndex((element) => element.id === elemen.id)
+        if (ele > -1) {
+          prueba = Tasks.splice(ele, 1); // 2nd parameter means remove one item only
+        }
+      }
+
     })
   } 
   const unsubs = () => {
