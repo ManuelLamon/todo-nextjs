@@ -34,7 +34,7 @@ function ListTask({ title = "TODO", data, setTaskSelect}: Props) {
   useEffect(() => {
     /* QueryTask(); */
     setTaskCopy(TaskList.filter(ele => ele.lista === data.id).sort((a,b) => Number(a.index) - Number(b.index)))
-  }, [TaskList]);
+  }, [TaskList, List]);
 
 
   return (

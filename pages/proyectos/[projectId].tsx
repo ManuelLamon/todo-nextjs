@@ -62,6 +62,7 @@ function projectId() {
       const data = List.find((ele) => ele.id === e) as List;
       const dataFilter = List.filter((ele) => ele.id !== e).sort((a, b) => Number(a.index) - Number(b.index));
       data.index = elementHtml.newIndex as number;
+      data.usuario_last_update = sesion.record.id;
       dataFilter.splice(Number(elementHtml.newIndex), 0, data);
       const dataIndex = dataFilter.map((value, index) => ({ ...value, index: index }));
       for (const element of dataIndex) {
@@ -76,31 +77,29 @@ function projectId() {
     PB.collection("tareas").subscribe("*", function (e) {
       if (e.record.usuario_last_update === sesion.record.id) {
         return;
-      } else {
-        console.log(e)
-        if (e.action === "update") {
-          const data:Task[] = TaskList.map((task) => {
-            if (task.id === e.record.id) {
-              return e.record as any;
-            }
-            return task;
-          });
-          let list = data.filter((ele) => ele.lista === e.record.lista)
-          const dato = list.findIndex(ele => ele.id === e.record.id)
-          if(dato){
-            list = array_move(list,dato,Number(e.record.index)).map((value, index) => ({ ...value, index: index }))
+      } 
+      if (e.action === "update") {
+        const data:Task[] = TaskList.map((task) => {
+          if (task.id === e.record.id) {
+            return e.record as any;
           }
-          for (const ele of list) {
-            for (let i = 0; i < data.length; i++) {
-              const element = data[i];
-              if(ele.id === element.id ){
-                data[i] = ele
-              }
-            }
-          }
-          setTaskList(data);
-          return;
+          return task;
+        });
+        let list = data.filter((ele) => ele.lista === e.record.lista)
+        const dato = list.findIndex(ele => ele.id === e.record.id)
+        if(dato){
+          list = array_move(list,dato,Number(e.record.index)).map((value, index) => ({ ...value, index: index }))
         }
+        for (const ele of list) {
+          for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if(ele.id === element.id ){
+              data[i] = ele
+            }
+          }
+        }
+        setTaskList(data);
+        return;
       }
     });
   };
@@ -109,8 +108,11 @@ function projectId() {
     PB.collection("tareas").unsubscribe();
   };
 
-  /* const subList = () => {
+  const subList = () => {
     PB.collection("listas").subscribe("*", function (e) {
+      if (e.record.usuario_last_update === sesion.record.id) {
+        return;
+      } 
       if (e.action === 'update') {
         setList(
           List.map((list) => {
@@ -127,16 +129,18 @@ function projectId() {
 
   const unsubsList = () => {
     PB.collection("listas").unsubscribe();
-  }; */
+  };
 
   useEffect(() => {
     if (TaskList.length && List.length) {
       sub();
+      subList()
     }
   }, [TaskList, List]);
   useEffect(() => {
     return () => {
       unsubs()
+      unsubsList()
     }
   }, []);
 

@@ -39,4 +39,5 @@ export interface List {
     nombre:         string;
     proyecto:       string;
     index:          string | number;
+    usuario_last_update: string;
 }
