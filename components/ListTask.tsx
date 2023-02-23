@@ -1,22 +1,21 @@
 import React, { useEffect, useState,useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
-import { PB } from "../utils";
 import CardTask from "./CardTask";
-import { ReactSortable, Sortable} from "react-sortablejs";
-import { Task } from "../interfaces/tasks";
+import { ReactSortable} from "react-sortablejs";
 import { proyectosContext } from "../context/proyectos/proyectosContext";
+import { Task } from "../context/proyectos/proyectosInterface";
+
 
 interface Props {
   title?: string;
   data: any;
   setTaskSelect: any;
-  id:any;
 }
 
-function ListTask({ title = "TODO", data, setTaskSelect,id }: Props) {
+function ListTask({ title = "TODO", data, setTaskSelect}: Props) {
   /* const [Tasks, setTasks] = useState<Task[]>([]); */
-  const { Tasks,setTasks } = useContext(proyectosContext);
+  const { TaskList } = useContext(proyectosContext);
 
   const [TaskCopy, setTaskCopy] = useState<Task[]>([])
 
@@ -34,18 +33,14 @@ function ListTask({ title = "TODO", data, setTaskSelect,id }: Props) {
 
   useEffect(() => {
     /* QueryTask(); */
-    setTaskCopy(Tasks[id])
-  }, []);
+    setTaskCopy(TaskList.filter(ele => ele.lista === data.id).sort((a,b) => Number(a.index) - Number(b.index)))
+    console.log(TaskList.filter(ele => ele.lista === data.id).sort((a,b) => Number(a.index) - Number(b.index)),'aqui')
+    console.log(TaskList);
+  }, [TaskList]);
 
-  useEffect(() => {
-    if(TaskCopy){
-      setTasks({...Tasks, [id]:TaskCopy})
-      console.log({...Tasks, [id]:TaskCopy})
-    }
-  }, [TaskCopy]);
 
   return (
-    <div className="flex overflow-x-hidden h-5/6 w-64 gap-3 flex-col items-center p-3 card bg-secondary " id={id}>
+    <div className="flex overflow-x-hidden h-5/6 w-64 gap-3 flex-col items-center p-3 card bg-secondary " id={data.id}>
       <div className="w-full flex justify-between flex-row items-center z-10 sticky top-0 card bg-slate-100 pl-3">
         <h1 className="font-bold">{title}</h1>
         <div className="dropdown dropdown-end">
@@ -72,8 +67,8 @@ function ListTask({ title = "TODO", data, setTaskSelect,id }: Props) {
         group={ {name:"shared"}}
         onChange={(e: any) => setTaskSelect(e.item.id,e)}
       >
-        {TaskCopy && TaskCopy.map((task: Task) => (
-          <div id={task.id}>
+        {TaskCopy && TaskCopy.map((task: Task,index) => (
+          <div id={task.id} key={index}>
             <CardTask Task={task} key={task.id} />
           </div>
         ))}

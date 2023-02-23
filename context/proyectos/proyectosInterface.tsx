@@ -27,6 +27,7 @@ export interface Task {
     fecha_fin:           Date;
     index:               string |number;
     proyecto:            string;
+    usuario_last_update: string;
 }
 
 export interface List {

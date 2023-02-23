@@ -1,18 +1,31 @@
 import { ReactNode, createContext, useContext, useState } from "react";
-import { SesionContextProps } from "./sesionInterface";
+import { Sesion, SesionContextProps } from "./sesionInterface";
 
-export const sesionContext = createContext({} as SesionContextProps)
+export const sesionContext = createContext({} as SesionContextProps);
 
-export const useSesion = () => useContext(sesionContext) 
+export const useSesion = () => useContext(sesionContext);
 
 interface Props {
-    children: ReactNode
+  children: ReactNode;
 }
 
-export const SesionContextProvider = ({children}:Props)  => {
+export const SesionContextProvider = ({ children }: Props) => {
+  const [sesion, setSesion] = useState<Sesion>({
+    token:"",
+    record:{
+    id: "",
+    collectionId: "",
+    collectionName: "",
+    created: "",
+    updated: "",
+    username: "",
+    verified: false,
+    emailVisibility: false,
+    email: "",
+    name: "",
+    avatar: "",
+    departamento: [],
+  }});
 
-    const [sesion, setSesion] = useState({})
-
-    return (<sesionContext.Provider value={{sesion, setSesion}}> {children}</sesionContext.Provider>)
-
-}
+  return <sesionContext.Provider value={{ sesion, setSesion }}> {children}</sesionContext.Provider>;
+};

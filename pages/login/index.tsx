@@ -4,12 +4,15 @@ import { sesionContext, useSesion } from '../../context/sesion/sesionContext'
 import { useForm } from 'react-hook-form'
 import { PB } from '../../utils'
 import HeadCustom from '../../components/HeadCustom'
+import { Sesion } from '../../context/sesion/sesionInterface'
+import { useRouter } from 'next/router'
 
 type Form = "Login" | "Register"
 
 function Login() {
 
     const {setSesion} = useContext(sesionContext)
+    const router = useRouter()
     const [TypeForm, setTypeForm] = useState<Form>("Login")
     const { register, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
@@ -23,10 +26,12 @@ function Login() {
 
 
 
-            const authData = await PB.collection("users").authWithPassword(data.email, data.password)
+            const authData:Sesion = await PB.collection("users").authWithPassword(data.email, data.password)
 
             console.log(authData);
             setSesion(authData)
+
+            router.push('/proyectos')
 
 
         } catch (error) {

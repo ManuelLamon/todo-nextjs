@@ -23,7 +23,7 @@ function index() {
       <h1 className=" text-4xl font-bold mb-4">Proyectos</h1>
       <div className="flex overflow-y-hidden h-full gap-3 w-fit p-3">
         {proyectos.map((proyecto, index) => (
-          <CardProyect proyect={proyecto} proyectIndex={index} />
+          <CardProyect proyect={proyecto} proyectIndex={index} key={index}/>
         ))}
       </div>
     </ScreenContainer>

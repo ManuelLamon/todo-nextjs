@@ -1,6 +1,6 @@
 export interface SesionContextProps {
-    sesion: Sesion | {} ,
-    setSesion: (e:Sesion | {}) => void;
+    sesion: Sesion  ,
+    setSesion: (e:Sesion) => void;
 }
 
 export interface Sesion {
@@ -12,8 +12,8 @@ export interface Record {
     id:              string;
     collectionId:    string;
     collectionName:  string;
-    created:         Date;
-    updated:         Date;
+    created:         string;
+    updated:         string;
     username:        string;
     verified:        boolean;
     emailVisibility: boolean;
