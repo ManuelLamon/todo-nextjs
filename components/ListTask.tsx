@@ -15,7 +15,7 @@ interface Props {
 
 function ListTask({ title = "TODO", data, setTaskSelect}: Props) {
   /* const [Tasks, setTasks] = useState<Task[]>([]); */
-  const { TaskList } = useContext(proyectosContext);
+  const { TaskList,List } = useContext(proyectosContext);
 
   const [TaskCopy, setTaskCopy] = useState<Task[]>([])
 
@@ -34,8 +34,6 @@ function ListTask({ title = "TODO", data, setTaskSelect}: Props) {
   useEffect(() => {
     /* QueryTask(); */
     setTaskCopy(TaskList.filter(ele => ele.lista === data.id).sort((a,b) => Number(a.index) - Number(b.index)))
-    console.log(TaskList.filter(ele => ele.lista === data.id).sort((a,b) => Number(a.index) - Number(b.index)),'aqui')
-    console.log(TaskList);
   }, [TaskList]);
 
 

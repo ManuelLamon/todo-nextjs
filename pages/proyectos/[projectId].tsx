@@ -9,10 +9,21 @@ import { proyectosContext } from "../../context/proyectos/proyectosContext";
 import { List, Task } from "../../context/proyectos/proyectosInterface";
 import { sesionContext } from "../../context/sesion/sesionContext";
 
+function array_move(arr:any[], old_index:number, new_index:number) {
+  if (new_index >= arr.length) {
+      var k = new_index - arr.length + 1;
+      while (k--) {
+          arr.push(undefined);
+      }
+  }
+  arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+  return arr; // for testing
+}
+
 function projectId() {
   const router = useRouter();
   const id = router.query.projectId;
-  const { List, setList, TaskList, setTaskList, Tasks, setTasks } = useContext(proyectosContext);
+  const { List, setList, TaskList, setTaskList} = useContext(proyectosContext);
   const { sesion } = useContext(sesionContext);
   const DataQuery = async () => {
     const records = (await PB.collection("listas").getFullList(200, {
@@ -24,15 +35,6 @@ function projectId() {
     })) as Task[];
     setTaskList(tasks);
     setList(records);
-
-    const orderData: any = {};
-    for (const lista of records) {
-      orderData[lista.id] = [];
-    }
-    for (const task of tasks) {
-      orderData[task.lista].push(task);
-    }
-    setTasks(orderData);
   };
 
   const handleTaskSelect = async (e: any, elementHtml: SortableEvent) => {
@@ -45,7 +47,8 @@ function projectId() {
       data.index = elementHtml.newIndex as number;
       data.usuario_last_update = sesion.record.id;
       dataFilter.splice(Number(elementHtml.newIndex), 0, data);
-      for (const element of dataFilter) {
+      const dataIndex = dataFilter.map((value, index) => ({ ...value, index: index }));
+      for (const element of dataIndex) {
         element.usuario_last_update = sesion.record.id;
         await PB.collection("tareas").update(element.id, element);
       }
@@ -73,17 +76,29 @@ function projectId() {
     PB.collection("tareas").subscribe("*", function (e) {
       if (e.record.usuario_last_update === sesion.record.id) {
         return;
-      }
-       else{
-        if (e.action === 'update') {
-          setTaskList(
-            TaskList.map((task) => {
-              if (task.id === e.record.id) {
-                return (e.record as any) ;
+      } else {
+        console.log(e)
+        if (e.action === "update") {
+          const data:Task[] = TaskList.map((task) => {
+            if (task.id === e.record.id) {
+              return e.record as any;
+            }
+            return task;
+          });
+          let list = data.filter((ele) => ele.lista === e.record.lista)
+          const dato = list.findIndex(ele => ele.id === e.record.id)
+          if(dato){
+            list = array_move(list,dato,Number(e.record.index)).map((value, index) => ({ ...value, index: index }))
+          }
+          for (const ele of list) {
+            for (let i = 0; i < data.length; i++) {
+              const element = data[i];
+              if(ele.id === element.id ){
+                data[i] = ele
               }
-              return task;
-            })
-          );
+            }
+          }
+          setTaskList(data);
           return;
         }
       }
@@ -94,14 +109,36 @@ function projectId() {
     PB.collection("tareas").unsubscribe();
   };
 
+  /* const subList = () => {
+    PB.collection("listas").subscribe("*", function (e) {
+      if (e.action === 'update') {
+        setList(
+          List.map((list) => {
+            if (list.id === e.record.id) {
+              return (e.record as any) ;
+            }
+            return list;
+          }).sort((a, b) => Number(a.index) - Number(b.index))
+        );
+        return;
+      }
+    });
+  };
+
+  const unsubsList = () => {
+    PB.collection("listas").unsubscribe();
+  }; */
+
   useEffect(() => {
-    if (TaskList.length && List.length && sesion.record.id) {
+    if (TaskList.length && List.length) {
       sub();
-      return () => {
-        unsubs();
-      };
     }
-  }, [TaskList, List, sesion]);
+  }, [TaskList, List]);
+  useEffect(() => {
+    return () => {
+      unsubs()
+    }
+  }, []);
 
   useEffect(() => {
     DataQuery();
