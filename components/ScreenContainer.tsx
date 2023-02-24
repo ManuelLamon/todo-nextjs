@@ -7,6 +7,9 @@ interface Props {
 }
 
 function ScreenContainer({ children }: Props) {
+
+    
+
     return (
         <div>
             <Sidebar/>

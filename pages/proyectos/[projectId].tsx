@@ -26,13 +26,13 @@ function projectId() {
   const { List, setList, TaskList, setTaskList} = useContext(proyectosContext);
   const { sesion } = useContext(sesionContext);
   const DataQuery = async () => {
-    const records = (await PB.collection("listas").getFullList(200, {
+    const records = await PB.collection("listas").getFullList(200, {
       sort: "index",
       filter: `proyecto="${id}"`,
-    })) as List[];
-    const tasks = (await PB.collection("tareas").getFullList(200, {
+    }) as List[];
+    const tasks = await PB.collection("tareas").getFullList(200, {
       filter: `proyecto="${id}"`,
-    })) as Task[];
+    }) as Task[];
     setTaskList(tasks);
     setList(records);
   };

@@ -6,6 +6,7 @@ import { PB } from '../../utils'
 import HeadCustom from '../../components/HeadCustom'
 import { Sesion } from '../../context/sesion/sesionInterface'
 import { useRouter } from 'next/router'
+import axios from 'axios'
 
 type Form = "Login" | "Register"
 
@@ -24,13 +25,11 @@ function Login() {
     const onSubmitData = handleSubmit(async (data) => {
         try {
 
-
-
-            const authData:Sesion = await PB.collection("users").authWithPassword(data.email, data.password)
-
-            console.log(authData);
-            setSesion(authData)
-
+            
+            const authData = await axios.post('/api/auth/login',{usernameOREmail:data.email, password:data.password} )
+            /* const authData:Sesion = await PB.collection("users").authWithPassword(data.email, data.password) */
+            console.log(authData)
+            setSesion(authData.data)
             router.push('/proyectos')
 
 
