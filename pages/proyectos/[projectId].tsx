@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from "next/router";
-import { useState, useEffect, useContext } from "react";
+import { useEffect, useContext } from "react";
 import { PB } from "../../utils";
 import ListTask from "../../components/ListTask";
 import ScreenContainer from "../../components/ScreenContainer";
@@ -145,11 +145,14 @@ function projectId() {
   }, []);
 
   useEffect(() => {
-    DataQuery();
-    if (!sesion.record.id) {
-      router.push("/login");
+    if(id){
+      DataQuery();
     }
-  }, [sesion]);
+    return () => {
+      setList([])
+      setTaskList([])
+    }
+  }, [id]);
 
   return (
     <ScreenContainer>
@@ -164,7 +167,7 @@ function projectId() {
           onChange={(e: any) => handleListSelect(e.item.id, e)}
         >
           {List.map((value: any, index) => (
-            <ListTask title={value.nombre} data={value} key={index + "asdcs"} setTaskSelect={handleTaskSelect} />
+            <ListTask title={value.name} data={value} key={index + "asdcs"} setTaskSelect={handleTaskSelect} />
           ))}
         </ReactSortable>
       </div>

@@ -1,12 +1,9 @@
-import React, { useContext } from "react";
 import ScreenContainer from "../../components/ScreenContainer";
 import { useState, useEffect } from "react";
 import { PB } from "../../utils";
 import CardProyect from "../../components/CardProyect";
-import { sesionContext } from "../../context/sesion/sesionContext";
 
 function index() {
-  const {sesion} = useContext(sesionContext)
   const [proyectos, setProyectos] = useState<any[]>([]);
 
   const DataQuery = async () => {

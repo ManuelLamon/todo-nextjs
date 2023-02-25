@@ -1,6 +1,7 @@
 export interface SesionContextProps {
     sesion: Sesion  ,
     setSesion: (e:Sesion) => void;
+    closeSesion: () => void;
 }
 
 export interface Sesion {

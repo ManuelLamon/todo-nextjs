@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faSignOut } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
+import { sesionContext } from '../context/sesion/sesionContext'
 
 export default function Sidebar() {
+
+  const {closeSesion} = useContext(sesionContext)
+
   return (
     <aside className=' fixed z-10'>
       <div className="flex h-screen w-20 flex-col justify-between border-r bg-white">
@@ -51,9 +55,9 @@ export default function Sidebar() {
         </div>
 
         <div className="sticky inset-x-0 bottom-0 border-t border-gray-100 bg-white p-2">
-          <form action="/logout">
+          <div >
             <button
-              type="submit"
+              onClick={() => closeSesion()}
               className="group relative flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
             >
               <FontAwesomeIcon icon={faSignOut} size={'1x'} />
@@ -64,7 +68,7 @@ export default function Sidebar() {
                 Logout
               </span>
             </button>
-          </form>
+          </div>
         </div>
       </div>
     </aside>

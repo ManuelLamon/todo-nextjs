@@ -26,10 +26,10 @@ function Login() {
         try {
 
             
-            const authData = await axios.post('/api/auth/login',{usernameOREmail:data.email, password:data.password} )
-            /* const authData:Sesion = await PB.collection("users").authWithPassword(data.email, data.password) */
+            await axios.post('/api/auth/login',{usernameOREmail:data.email, password:data.password} )
+            const authData:Sesion = await PB.collection("users").authWithPassword(data.email, data.password)
             console.log(authData)
-            setSesion(authData.data)
+            setSesion(authData)
             router.push('/proyectos')
 
 
