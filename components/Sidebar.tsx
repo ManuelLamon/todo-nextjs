@@ -61,12 +61,6 @@ export default function Sidebar() {
               className="group relative flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
             >
               <FontAwesomeIcon icon={faSignOut} size={'1x'} />
-
-              <span
-                className="absolute left-full top-1/2 ml-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
-              >
-                Logout
-              </span>
             </button>
           </div>
         </div>

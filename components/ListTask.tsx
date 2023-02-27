@@ -1,11 +1,28 @@
 import React, { useEffect, useState,useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import CardTask from "./CardTask";
 import { ReactSortable} from "react-sortablejs";
 import { proyectosContext } from "../context/proyectos/proyectosContext";
 import { Task } from "../context/proyectos/proyectosInterface";
+import Modal from "./Modal";
+import { RequestCreateTask } from "../interfaces/tasks";
+import ModalTask from "./modals/ModalTask";
 
+
+const initialCreateTaskState:RequestCreateTask = {
+  descripcion: "",
+  fecha_init: new Date().toISOString(),
+  departamento: "",
+  usuario_creador: "",
+  archivos: "",
+  usuario_responsable: "",
+  lista: "",
+  fecha_fin: new Date().toISOString(),
+  index: "",
+  proyecto: "",
+  usuario_last_update: ""
+}
 
 interface Props {
   title?: string;
@@ -14,26 +31,36 @@ interface Props {
 }
 
 function ListTask({ title = "TODO", data, setTaskSelect}: Props) {
-  /* const [Tasks, setTasks] = useState<Task[]>([]); */
+
+  const [IsOpenCreateTask, setIsOpenCreateTask] = useState<boolean>(false)
+  const [dataTask, setDataTask] = useState<RequestCreateTask | Task >(initialCreateTaskState)
+
   const { TaskList,List } = useContext(proyectosContext);
 
   const [TaskCopy, setTaskCopy] = useState<Task[]>([])
-
-/*   const QueryTask = async () => {
-    const records: any = await PB.collection("tareas").getFullList(200, {
-      sort: "index",
-      filter: `lista="${data.id}"`,
-    });
-
-  }; */
 
   const onChangeData = (newState: any) => {
     setTaskCopy(newState)
   };
 
+  const createTask = () => {
+    setDataTask(initialCreateTaskState)
+    setIsOpenCreateTask(true)
+  }
+
+  const updateTask = (e:string) => {
+    const task = TaskCopy.find(ele => ele.id === e) as Task
+    setDataTask(task)
+    setIsOpenCreateTask(true)
+  }
+
   useEffect(() => {
-    /* QueryTask(); */
+
     setTaskCopy(TaskList.filter(ele => ele.lista === data.id).sort((a,b) => Number(a.index) - Number(b.index)))
+
+    return () => {
+      setTaskCopy([])
+    }
   }, [TaskList, List]);
 
 
@@ -41,7 +68,10 @@ function ListTask({ title = "TODO", data, setTaskSelect}: Props) {
     <div className="flex overflow-x-hidden h-5/6 w-64 gap-3 flex-col items-center p-3 card bg-secondary " id={data.id}>
       <div className="w-full flex justify-between flex-row items-center z-10 sticky top-0 card bg-slate-100 pl-3">
         <h1 className="font-bold">{title}</h1>
-        <div className="dropdown dropdown-end">
+        <div onClick={() => createTask()}  className="p-3 cursor-pointer active:scale-90 tooltip tooltip-bottom" data-tip="crear tarea">
+          <FontAwesomeIcon icon={faPlus} size={"xl"} />
+        </div>
+       {/*  <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn btn-ghost m-1">
             <FontAwesomeIcon icon={faEllipsisV} size={"xl"} />
           </label>
@@ -53,7 +83,7 @@ function ListTask({ title = "TODO", data, setTaskSelect}: Props) {
               <a>Item 2</a>
             </li>
           </ul>
-        </div>
+        </div> */}
       </div>
       <ReactSortable
         id={data.id}
@@ -67,11 +97,11 @@ function ListTask({ title = "TODO", data, setTaskSelect}: Props) {
       >
         {TaskCopy && TaskCopy.map((task: Task,index) => (
           <div id={task.id} key={index}>
-            <CardTask Task={task} key={task.id} />
+            <CardTask Task={task} key={task.id} updateTask={updateTask} />
           </div>
         ))}
       </ReactSortable>
-      {/* DAta */}
+      <ModalTask isOpen={IsOpenCreateTask} setIsOpen={setIsOpenCreateTask} data={dataTask}/>
     </div>
   );
 }
