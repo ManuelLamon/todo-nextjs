@@ -7,9 +7,10 @@ import { Task } from '../interfaces/tasks';
 interface Props {
     Task:Task;
     updateTask: (e:string) => void
+    showImage: (e:string) => void
 }
 
-function CardTask({Task,updateTask }:Props) {
+function CardTask({Task,updateTask,showImage }:Props) {
 
     const [Url, setUrl] = useState("")
 
@@ -27,8 +28,9 @@ function CardTask({Task,updateTask }:Props) {
     
     return (
         <div className="card card-compact w-full bg-base-100 shadow-xl mb-3">
-            <figure>{Task.foto && <img src={`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`} />}</figure>
+            <figure>{Task.foto && <img src={`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`} onClick={() => {showImage(`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`) }} />}</figure>
             <div className="card-body">
+                <div className='text-lg font-semibold'>{Task.descripcion}</div>
                 <div className='text-base'>{Task.descripcion}</div>
                 <div className="card-actions justify-end">
                     

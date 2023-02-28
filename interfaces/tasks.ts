@@ -30,6 +30,7 @@ export interface List {
 }
 
 export interface RequestCreateTask {
+    titulo:              string;
     descripcion:         string;
     fecha_init:          string;
     departamento:        string;

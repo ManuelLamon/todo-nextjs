@@ -11,8 +11,6 @@ import { sesionContext } from "../../context/sesion/sesionContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../components/Modal";
-import ModalTask from "../../components/modals/ModalTask";
-import { RequestCreateTask } from "../../interfaces/tasks";
 
 function array_move(arr: any[], old_index: number, new_index: number) {
   if (new_index >= arr.length) {
@@ -187,13 +185,13 @@ function projectId() {
           ))}
         </ReactSortable>
       </div>
-      <div
+      <button
         data-tip="crear tarea"
         onClick={() => setIsOpenCreateList(true)}
         className=" fixed z-90 bottom-4 right-5  w-16 h-16 rounded-full drop-shadow-lg flex justify-center items-center text-white text-3xl btn btn-primary tooltip tooltip-top"
       >
         <FontAwesomeIcon icon={faPlus} />
-      </div>
+      </button>
       <Modal isOpen={IsOpenCreateList} setIsOpen={setIsOpenCreateList} >
           <h3 className="text-lg font-bold">Congratulations random Internet user!</h3>
           <p className="py-4">
