@@ -29,6 +29,7 @@ export interface Task {
     proyecto:            string;
     usuario_last_update: string;
     foto:                string;
+    titulo:              string;
 }
 
 export interface List {

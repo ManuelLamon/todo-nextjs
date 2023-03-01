@@ -2,7 +2,7 @@ import TextField from "@mui/material/TextField";
 import React, { useContext, useEffect, useState, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { sesionContext } from "../../context/sesion/sesionContext";
-import { RequestCreateTask, Task } from "../../interfaces/tasks";
+import { RequestCreateTask } from "../../interfaces/tasks";
 import { PB } from "../../utils";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
@@ -15,6 +15,10 @@ import FormControl from "@mui/material/FormControl";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { useDropzone } from "react-dropzone";
 import moment from "moment";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
+import { Task } from "../../context/proyectos/proyectosInterface";
+import { proyectosContext } from "../../context/proyectos/proyectosContext";
 
 const style = {
   position: "absolute" as "absolute",
@@ -37,9 +41,12 @@ type autocompleteItem = { label: string; id: string };
 
 function ModalTask({ data, isOpen, setIsOpen }: Props) {
   const { sesion } = useContext(sesionContext);
+  const { TaskList, setTaskList } = useContext(proyectosContext);
   const [Usuarios, setUsuarios] = useState<autocompleteItem[]>([]);
   const [Departamentos, setDepartamentos] = useState<any[]>([]);
   const [IsUpdate, setIsUpdate] = useState<boolean>(false);
+  const [FileShow, setFileShow] = useState<string>("");
+  const [File, setFile] = useState<File | null>(null);
   const consultarUsuario = async (depa: string) => {
     const data = await PB.collection("users").getFullList(200);
     const copy = data
@@ -80,17 +87,45 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
     setIsOpen(false);
   };
 
-  const onSubmitData = handleSubmit(async (data) => {
+  const onSubmitData = handleSubmit(async (formInfo) => {
     try {
-      console.log(data);
-      /* await axios.post("/api/auth/login", { usernameOREmail: data.email, password: data.password });
-      const authData: Sesion = await PB.collection("users").authWithPassword(
-        data.email,
-        data.password
-      );
-      console.log(authData);
-      setSesion(authData);
-      router.push("/proyectos"); */
+      console.log(formInfo);
+      let formData;
+      if(File){
+        formData = new FormData()
+        for (const key in data) {
+          formData.append(key,(formInfo[key as keyof RequestCreateTask]))
+          formData.getAll(key)
+          /* if (Object.prototype.hasOwnProperty.call(data, key)) {
+            const element = data[key];
+            
+          } */
+        }
+     
+        formData.append('foto',(File as File))
+      }else{
+        formData = formInfo
+      }
+
+      if (!data.id) {
+        console.log(data.id)
+        console.log('crear')
+        const record:Task = await PB.collection('tareas').create(formData)
+        /* handleTaskSelect(record) */
+      }else{
+        console.log('actualizar')
+       const record = await PB.collection('tareas').update(data.id,formData)
+        const tareas: Task[] = TaskList.map((task) => {
+          if (task.id === data.id) {
+            return record as any;
+          }
+          return task;
+        });
+        setTaskList(tareas)
+      }
+
+      setIsOpen(false)
+
     } catch (error) {
       console.log(error);
       alert(error);
@@ -100,8 +135,50 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
   const onDrop = useCallback((acceptedFiles: any) => {
     // Do something with the files
     console.log(acceptedFiles);
+    const reader = new FileReader();
+    reader.readAsDataURL(acceptedFiles[0]);
+
+    reader.addEventListener("load", (e: any) => {
+      const img = new Image();
+      img.src = e.target.result;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx?.drawImage(img, 0, 0);
+        ctx?.getImageData(0, 0, img.width, img.height);
+
+        const dataurl = canvas.toDataURL("image/webp", 0.5);
+        setFileShow(dataurl);
+        setFile(acceptedFiles[0]);
+      };
+    });
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
+  /* const handleTaskSelect = async (e: Task) => {
+    try {
+      const dataFilter = TaskList.filter((ele) => ele.lista === e.lista)
+      dataFilter.unshift(e)
+      const dataIndex = dataFilter.map((value, index) => ({ ...value, index: index }));
+      for (const element of dataIndex) {
+        element.usuario_last_update = sesion.record.id;
+        await PB.collection("tareas").update(element.id, element);
+      }
+      let copy = [...TaskList]
+      for (const ele of dataIndex) {
+        for (let i = 0; i < copy.length; i++) {
+          if (copy[i].id === e.id) {
+            copy[i] = ele;
+          }
+        }
+      }
+      setTaskList(copy)
+    } catch (error) {
+      alert(error);
+    }
+  }; */
 
   useEffect(() => {
     if (watch("departamento")) {
@@ -115,22 +192,26 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
   }, [Departamentos]);
   useEffect(() => {
     console.log(data);
-    if (!data.lista) {
-      setValue("proyecto", data.proyecto);
-      setValue("lista", data.lista);
+    const { usuario_responsable, proyecto, lista, index, usuario_creador, descripcion, titulo, fecha_fin, fecha_init } =
+      data;
+    if (!data.id) {
+      setValue("proyecto", proyecto);
+      setValue("lista", lista);
       setValue("index", "0");
       setValue("usuario_creador", sesion.record.id);
     }
-    if (data.lista) {
-      const { usuario_responsable, proyecto, lista, index, usuario_creador, descripcion } = data;
+    if (data.id) {
       setIsUpdate(true);
       setValue("usuario_responsable", usuario_responsable);
       setValue("proyecto", proyecto);
       setValue("lista", lista);
+      setValue("titulo", titulo);
       setValue("index", index.toString());
       setValue("usuario_last_update", sesion.record.id);
       setValue("usuario_creador", usuario_creador);
       setValue("descripcion", descripcion);
+      setValue("fecha_fin", fecha_fin as string);
+      setValue("fecha_init", fecha_init as string);
     }
     console.log(watch("usuario_responsable"));
     if (isOpen) {
@@ -140,6 +221,8 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
       setUsuarios([]);
       reset();
       setIsUpdate(false);
+      setFileShow("");
+      setFile(null);
     }
   }, [isOpen, data]);
 
@@ -159,15 +242,21 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
     >
       <Fade in={isOpen}>
         <Box className=" card card-compact max-w-none max-h-screen w-1/2 h-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 absolute modal-box border-2 ">
+          <button
+            onClick={() => closeModal()}
+            className=" fixed z-90 top-0 right-0  w-10 h-10 flex justify-center items-center text-white text-xl btn btn-error"
+          >
+            X
+          </button>
           <h3 className=" card-title font-bold">{IsUpdate ? "Actualizar Tarea" : "Crear Tarea"}</h3>
-          {!(data as Task).foto && (
+          {!(data as Task).foto && !FileShow && (
             <div
               {...getRootProps({
                 className:
                   "border-dashed border-2 min-h-[300px] rounded-lg flex justify-center items-center cursor-pointer text-lg font-bold",
               })}
             >
-              <input {...getInputProps({ className: " " })} />
+              <input {...getInputProps()} />
               {isDragActive ? (
                 <p>Drop the files here ...</p>
               ) : (
@@ -177,11 +266,24 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
           )}
 
           {(data as Task).foto && (
-            <figure className="my-5 rounded-lg shadow-md min-h-[300px]">
-              <img
-                src={`${process.env.API}/api/files/vnqo14u55d0vubr/${(data as Task).id}/${(data as Task).foto}`}
-                className="rounded-lg"
-              />
+            <div {...getRootProps()}>
+              <figure className="my-5 rounded-lg min-h-[300px] relative">
+                <div className="absolute opacity-0 hover:opacity-50 w-full h-full flex items-end cursor-pointer transition-all ease-in-out duration-300">
+                  <div className="w-full h-full bg-black flex justify-center items-center">
+                  <FontAwesomeIcon icon={faPen}/>
+                  </div>
+                </div>
+                <img
+                  src={`${process.env.API}/api/files/vnqo14u55d0vubr/${(data as Task).id}/${(data as Task).foto}`}
+                  className="rounded-lg h-96 object-contain"
+                />
+                <input {...getInputProps()} />
+              </figure>
+            </div>
+          )}
+          {FileShow && (
+            <figure className="my-5 rounded-lg min-h-[300px] ">
+              <img src={FileShow} className="rounded-lg h-80" />
             </figure>
           )}
           <form
@@ -191,27 +293,21 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
           >
             <div className="w-full">
               <Controller
-                name="departamento"
-                key={"departamento"}
+                name="titulo"
+                key={"titulo"}
                 control={control}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Titulo</InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Departamentos"
-                      className="w-full"
-                      {...field}
-                    >
-                      {Departamentos.map((e, index) => (
-                        <MenuItem key={index} value={e.id}>
-                          {e.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                  <TextField
+                    id="titulo-input"
+                    label="Titulo"
+                    variant="outlined"
+                    className="w-full"
+                    inputProps={{ className: "border-transparent focus:border-transparent focus:ring-0 " , maxLength:"30"}}
+                    {...field}
+                    error={errors.titulo ? true : false}
+                    helperText={errors.titulo && "Este campo es requerido"}
+                  />
                 )}
               />
             </div>
@@ -222,22 +318,18 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
                 control={control}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Departamentos</InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Departamentos"
-                      className="w-full"
-                      {...field}
-                    >
-                      {Departamentos.map((e, index) => (
-                        <MenuItem key={index} value={e.id}>
-                          {e.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                  <TextField
+                    id="descripcion-input"
+                    label="Descripcion"
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                    className="w-full focus:border-0"
+                    inputProps={{ className: "border-transparent focus:border-transparent focus:ring-0 "}}
+                    {...field}
+                    error={errors.descripcion ? true : false}
+                    helperText={errors.descripcion && "Este campo es requerido"}
+                  />
                 )}
               />
             </div>
@@ -273,7 +365,6 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
                   name="usuario_responsable"
                   key={"usuario_responsable"}
                   control={control}
-                  rules={{ required: true }}
                   render={({ field }) => (
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label">Responsable</InputLabel>
@@ -301,7 +392,6 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
                   name="fecha_init"
                   key={"fecha_init"}
                   control={control}
-                  rules={{ required: true }}
                   render={({ field }) => (
                     <DateTimePicker
                       className="w-full"
@@ -319,7 +409,6 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
                   name="fecha_fin"
                   key={"fecha_fin"}
                   control={control}
-                  rules={{ required: true }}
                   render={({ field }) => (
                     <DateTimePicker
                       className="w-full"

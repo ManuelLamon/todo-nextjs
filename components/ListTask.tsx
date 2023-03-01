@@ -4,10 +4,10 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import CardTask from "./CardTask";
 import { ReactSortable } from "react-sortablejs";
 import { proyectosContext } from "../context/proyectos/proyectosContext";
-import { Task } from "../context/proyectos/proyectosInterface";
 import Modal from "./Modal";
 import { RequestCreateTask } from "../interfaces/tasks";
 import ModalTask from "./modals/ModalTask";
+import { List, Task } from "../context/proyectos/proyectosInterface";
 
 const initialCreateTaskState: RequestCreateTask = {
   titulo:"",
@@ -19,7 +19,7 @@ const initialCreateTaskState: RequestCreateTask = {
   usuario_responsable: "",
   lista: "",
   fecha_fin: new Date().toISOString(),
-  index: "",
+  index: "0",
   proyecto: "",
   usuario_last_update: "",
 };
@@ -44,8 +44,12 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
     setTaskCopy(newState);
   };
 
-  const createTask = () => {
-    setDataTask(initialCreateTaskState);
+  const createTask = (e: string) => {
+    const list = List.find((ele) => ele.id === e) as List;
+    const dataCopy= {...initialCreateTaskState}
+    dataCopy.lista = list.id
+    dataCopy.proyecto = list.proyecto
+    setDataTask(dataCopy);
     setIsOpenCreateTask(true);
   };
 
@@ -78,11 +82,11 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
   }, [toggler]);
 
   return (
-    <div className="flex overflow-x-hidden h-5/6 w-64 gap-3 flex-col items-center p-3 card bg-secondary " id={data.id}>
+    <div className="flex overflow-x-hidden h-[90%] w-64 gap-3 flex-col items-center p-3 card bg-secondary " id={data.id}>
       <div className="w-full flex justify-between flex-row items-center z-10 sticky top-0 card bg-slate-100 pl-3">
         <h1 className="font-bold">{title}</h1>
         <div
-          onClick={() => createTask()}
+          onClick={() => createTask(data.id)}
           className="p-3 cursor-pointer active:scale-90 tooltip tooltip-bottom"
           data-tip="crear tarea"
         >
@@ -108,7 +112,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
         setList={onChangeData}
         animation={200}
         easing="ease-out"
-        className="w-full h-full"
+        className="w-full h-full pb-3"
         group={{ name: "shared" }}
         onChange={(e: any) => setTaskSelect(e.item.id, e)}
       >

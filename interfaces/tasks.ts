@@ -1,9 +1,10 @@
 export interface Task {
     id:                  string;
+    titulo:              string;
     collectionId:        string;
     collectionName:      string;
-    created:             Date;
-    updated:             Date;
+    created:             Date | string;
+    updated:             Date | string;
     descripcion:         string;
     fecha_init:          Date;
     departamento:        string;
@@ -11,7 +12,7 @@ export interface Task {
     archivos:            string[];
     usuario_responsable: string;
     lista:               string;
-    fecha_fin:           Date;
+    fecha_fin:           Date | string;
     index:               string | number;
     proyecto:            string;
     usuario_last_update: string;
