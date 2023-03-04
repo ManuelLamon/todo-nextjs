@@ -84,13 +84,9 @@ function projectId() {
       if (e.record.usuario_last_update === sesion.record.id) {
         return;
       }
-      if (e.action === "update") {
-        const data: Task[] = TaskList.map((task) => {
-          if (task.id === e.record.id) {
-            return e.record as any;
-          }
-          return task;
-        });
+      if (e.action === "create") {
+        const data: Task[] = [...TaskList];
+        data.unshift(e.record as any)
         let list = data.filter((ele) => ele.lista === e.record.lista);
         const dato = list.findIndex((ele) => ele.id === e.record.id);
         if (dato) {
@@ -109,6 +105,35 @@ function projectId() {
         }
         setTaskList(data);
         return;
+      }
+      if (e.action === "update") {
+        if(e.record.active){
+          const data: Task[] = TaskList.map((task) => {
+            if (task.id === e.record.id) {
+              return e.record as any;
+            }
+            return task;
+          });
+          let list = data.filter((ele) => ele.lista === e.record.lista);
+          const dato = list.findIndex((ele) => ele.id === e.record.id);
+          if (dato) {
+            list = array_move(list, dato, Number(e.record.index)).map((value, index) => ({
+              ...value,
+              index: index,
+            }));
+          }
+          for (const ele of list) {
+            for (let i = 0; i < data.length; i++) {
+              const element = data[i];
+              if (ele.id === element.id) {
+                data[i] = ele;
+              }
+            }
+          }
+          setTaskList(data);
+          return;
+        }
+        
       }
     });
   };

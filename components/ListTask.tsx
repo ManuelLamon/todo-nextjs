@@ -9,7 +9,8 @@ import { RequestCreateTask } from "../interfaces/tasks";
 import ModalTask from "./modals/ModalTask";
 import { List, Task } from "../context/proyectos/proyectosInterface";
 
-const initialCreateTaskState: RequestCreateTask = {
+export const initialCreateTaskState: RequestCreateTask = {
+  id:'',
   titulo:"",
   descripcion: "",
   fecha_init: new Date().toISOString(),

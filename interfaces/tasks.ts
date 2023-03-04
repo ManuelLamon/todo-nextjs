@@ -31,6 +31,7 @@ export interface List {
 }
 
 export interface RequestCreateTask {
+    id:                  string;
     titulo:              string;
     descripcion:         string;
     fecha_init:          string;

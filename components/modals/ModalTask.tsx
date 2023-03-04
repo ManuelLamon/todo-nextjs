@@ -19,6 +19,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { Task } from "../../context/proyectos/proyectosInterface";
 import { proyectosContext } from "../../context/proyectos/proyectosContext";
+import { initialCreateTaskState } from "../ListTask";
 
 const style = {
   position: "absolute" as "absolute",
@@ -91,18 +92,22 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
     try {
       console.log(formInfo);
       let formData;
+      const datos = Object.keys({...initialCreateTaskState})
       if(File){
         formData = new FormData()
         for (const key in data) {
-          formData.append(key,(formInfo[key as keyof RequestCreateTask]))
-          formData.getAll(key)
+          if(datos.includes(key) && key !== 'foto'){
+            console.log(key,formInfo[key as keyof RequestCreateTask]);
+            formData.append(key,(formInfo[key as keyof RequestCreateTask]))
+          }
+          
           /* if (Object.prototype.hasOwnProperty.call(data, key)) {
             const element = data[key];
             
           } */
         }
-     
         formData.append('foto',(File as File))
+        formData.get('foto')
       }else{
         formData = formInfo
       }
@@ -111,9 +116,9 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
         console.log(data.id)
         console.log('crear')
         const record:Task = await PB.collection('tareas').create(formData)
-        /* handleTaskSelect(record) */
+        handleTaskSelect(record)
       }else{
-        console.log('actualizar')
+        console.log('actualizar',data.id)
        const record = await PB.collection('tareas').update(data.id,formData)
         const tareas: Task[] = TaskList.map((task) => {
           if (task.id === data.id) {
@@ -157,7 +162,7 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-  /* const handleTaskSelect = async (e: Task) => {
+  const handleTaskSelect = async (e: Task) => {
     try {
       const dataFilter = TaskList.filter((ele) => ele.lista === e.lista)
       dataFilter.unshift(e)
@@ -167,9 +172,10 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
         await PB.collection("tareas").update(element.id, element);
       }
       let copy = [...TaskList]
+      copy.unshift(e)
       for (const ele of dataIndex) {
         for (let i = 0; i < copy.length; i++) {
-          if (copy[i].id === e.id) {
+          if (copy[i].id === ele.id) {
             copy[i] = ele;
           }
         }
@@ -178,7 +184,7 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
     } catch (error) {
       alert(error);
     }
-  }; */
+  };
 
   useEffect(() => {
     if (watch("departamento")) {
@@ -265,9 +271,9 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
             </div>
           )}
 
-          {(data as Task).foto && (
-            <div {...getRootProps()}>
-              <figure className="my-5 rounded-lg min-h-[300px] relative">
+          {(data as Task).foto && !FileShow && (
+            <div {...getRootProps( {className:'h-1/2 mb-4'})}>
+              <figure className="my-5 rounded-lg h-full relative">
                 <div className="absolute opacity-0 hover:opacity-50 w-full h-full flex items-end cursor-pointer transition-all ease-in-out duration-300">
                   <div className="w-full h-full bg-black flex justify-center items-center">
                   <FontAwesomeIcon icon={faPen}/>
@@ -425,6 +431,9 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
             <div className="h-1/6 flex gap-4 justify-end items-end ">
               <button className="btn btn-primary font-bold" type="submit">
                 Enviar
+              </button>
+              <button className="btn btn-error font-bold" type="submit">
+                Eliminar
               </button>
             </div>
           </form>
