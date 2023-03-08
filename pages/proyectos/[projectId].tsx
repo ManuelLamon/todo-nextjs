@@ -6,11 +6,11 @@ import ListTask from "../../components/ListTask";
 import ScreenContainer from "../../components/ScreenContainer";
 import { ReactSortable, SortableEvent } from "react-sortablejs";
 import { proyectosContext } from "../../context/proyectos/proyectosContext";
-import { List, Task } from "../../context/proyectos/proyectosInterface";
+import { List, RequestCreateList, Task } from "../../context/proyectos/proyectosInterface";
 import { sesionContext } from "../../context/sesion/sesionContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import Modal from "../../components/Modal";
+import ModalList from "../../components/modals/ModalList";
 
 function array_move(arr: any[], old_index: number, new_index: number) {
   if (new_index >= arr.length) {
@@ -23,12 +23,23 @@ function array_move(arr: any[], old_index: number, new_index: number) {
   return arr; // for testing
 }
 
+export const initialCreateListState: RequestCreateList = {
+  id:'',
+  name:"",
+  usuario_creador: "",
+  index: "0",
+  proyecto: "",
+  usuario_last_update: "",
+  tipo:""
+};
+
 function projectId() {
   const router = useRouter();
   const id = router.query.projectId;
   const { List, setList, TaskList, setTaskList } = useContext(proyectosContext);
   const [IsOpenCreateList, setIsOpenCreateList] = useState<boolean>(false)
   const { sesion } = useContext(sesionContext);
+  const [dataList, setDataList] = useState<RequestCreateList | List>(initialCreateListState);
   const DataQuery = async () => {
     const records = (await PB.collection("listas").getFullList(200, {
       sort: "index",
@@ -107,32 +118,31 @@ function projectId() {
         return;
       }
       if (e.action === "update") {
-        if(e.record.active){
-          const data: Task[] = TaskList.map((task) => {
-            if (task.id === e.record.id) {
-              return e.record as any;
-            }
-            return task;
-          });
-          let list = data.filter((ele) => ele.lista === e.record.lista);
-          const dato = list.findIndex((ele) => ele.id === e.record.id);
-          if (dato) {
-            list = array_move(list, dato, Number(e.record.index)).map((value, index) => ({
-              ...value,
-              index: index,
-            }));
+        console.log(e,'aqui');
+        const data: Task[] = TaskList.map((task) => {
+          if (task.id === e.record.id) {
+            return e.record as any;
           }
-          for (const ele of list) {
-            for (let i = 0; i < data.length; i++) {
-              const element = data[i];
-              if (ele.id === element.id) {
-                data[i] = ele;
-              }
-            }
-          }
-          setTaskList(data);
-          return;
+          return task;
+        });
+        let list = data.filter((ele) => ele.lista === e.record.lista);
+        const dato = list.findIndex((ele) => ele.id === e.record.id);
+        if (dato) {
+          list = array_move(list, dato, Number(e.record.index)).map((value, index) => ({
+            ...value,
+            index: index,
+          }));
         }
+        for (const ele of list) {
+          for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if (ele.id === element.id) {
+              data[i] = ele;
+            }
+          }
+        }
+        setTaskList(data);
+        return;
         
       }
     });
@@ -181,6 +191,7 @@ function projectId() {
   useEffect(() => {
     if (id) {
       DataQuery();
+      setDataList({...dataList,proyecto:(id as string)})
     }
     return () => {
       setList([]);
@@ -211,18 +222,13 @@ function projectId() {
         </ReactSortable>
       </div>
       <button
-        data-tip="crear tarea"
+        data-tip="crear lista"
         onClick={() => setIsOpenCreateList(true)}
-        className=" fixed z-90 bottom-4 right-5  w-16 h-16 rounded-full drop-shadow-lg flex justify-center items-center text-white text-3xl btn btn-primary tooltip tooltip-top"
+        className=" fixed z-90 bottom-4 right-5  w-16 h-16 rounded-full drop-shadow-lg flex justify-center items-center text-white text-3xl btn btn-primary tooltip tooltip-left"
       >
         <FontAwesomeIcon icon={faPlus} />
       </button>
-      <Modal isOpen={IsOpenCreateList} setIsOpen={setIsOpenCreateList} >
-          <h3 className="text-lg font-bold">Congratulations random Internet user!</h3>
-          <p className="py-4">
-          IsOpenCreateTask
-          </p>
-      </Modal>
+      <ModalList data={dataList} isOpen={IsOpenCreateList} setIsOpen={setIsOpenCreateList}/>
     </ScreenContainer>
   );
 }

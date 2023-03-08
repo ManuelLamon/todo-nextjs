@@ -3,12 +3,14 @@ import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import { sesionContext } from "../context/sesion/sesionContext";
 import { useRouter } from "next/router";
+import { RenderContext } from "../context/render/renderContext";
 interface Props {
   children: ReactNode;
 }
 
 function ScreenContainer({ children }: Props) {
     const {sesion, setSesion} = useContext(sesionContext)
+    const {setLoader} = useContext(RenderContext)
     const router = useRouter();
   useEffect(() => {
     if(typeof document != 'undefined' ){
@@ -22,6 +24,20 @@ function ScreenContainer({ children }: Props) {
         }
     }
   }, [sesion]);
+
+  useEffect(() => {
+    const handleStart = (url:any) => (url !== router.asPath) && setLoader(true);
+    const handleComplete = (url:any) => (url === router.asPath) && setTimeout(() =>{setLoader(false)},1000);
+
+    router.events.on('routeChangeStart', (url) => handleStart(url))
+    router.events.on('routeChangeComplete', (url) => handleComplete(url))
+    router.events.on('routeChangeError', (url) => handleComplete(url))
+    return () => {
+      router.events.on('routeChangeStart', (url) => handleStart(url))
+      router.events.on('routeChangeComplete', (url) => handleComplete(url))
+      router.events.on('routeChangeError', (url) => handleComplete(url))
+    }
+  }, [router.events]);
 
   return (
     <div>

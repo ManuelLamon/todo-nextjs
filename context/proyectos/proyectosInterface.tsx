@@ -3,8 +3,10 @@ export interface ProyectoContextProps {
     setList: (e:List[]) => void;
     TaskList: Task[];
     setTaskList:(e:Task[]) => void;
-    Tasks: Tasks ;
-    setTasks:(e:Tasks) => void;
+    Proyectos: Proyecto[] ;
+    setProyectos:(e:Proyecto[]) => void;
+    TiposLista: TipoLista[] ;
+    setTiposLista:(e:TipoLista[]) => void;
 }
 
 export interface Tasks {
@@ -13,10 +15,11 @@ export interface Tasks {
 
 export interface Task {
     id:                  string;
+    titulo:              string;
     collectionId:        string;
     collectionName:      string;
-    created:             Date;
-    updated:             Date;
+    created:             Date | string;
+    updated:             Date | string;
     descripcion:         string;
     fecha_init:          Date;
     departamento:        string;
@@ -24,22 +27,84 @@ export interface Task {
     archivos:            string[];
     usuario_responsable: string;
     lista:               string;
-    fecha_fin:           Date;
+    fecha_fin:           Date | string;
     index:               string | number;
     proyecto:            string;
     usuario_last_update: string;
     foto:                string;
-    titulo:              string;
 }
 
+
 export interface List {
+    id:                  string;
+    collectionId:        string;
+    collectionName:      string;
+    created:             Date;
+    updated:             Date;
+    name:                string;
+    index:               string | number;
+    proyecto:            string;
+    usuario_last_update: string;
+    tipo:                string;
+    usuario_creador:     string;
+    departamento:        string;
+}
+
+export interface Proyecto {
     id:             string;
     collectionId:   string;
     collectionName: string;
     created:        Date;
     updated:        Date;
-    nombre:         string;
-    proyecto:       string;
-    index:          string | number;
+    name:           string;
+    estatus:        string;
+    departamento:   string;
+    description:    string;
+    image:          string;
+}
+
+export interface TipoLista {
+    id:             string;
+    collectionId:   string;
+    collectionName: string;
+    created:        Date;
+    updated:        Date;
+    name:           string;
+    descripcion:    string;
+}
+
+
+
+export interface RequestCreateList {
+    id:                  string;
+    name:                string;
+    index:               string | number;
+    proyecto:            string;
+    usuario_last_update: string;
+    tipo:                string;
+    usuario_creador:     string;
+}
+export interface RequestCreateTask {
+    id:                  string;
+    titulo:              string;
+    descripcion:         string;
+    fecha_init:          string;
+    departamento:        string;
+    usuario_creador:     string;
+    archivos:            string;
+    usuario_responsable: string;
+    lista:               string;
+    fecha_fin:           string;
+    index:               string;
+    proyecto:            string;
     usuario_last_update: string;
 }
+export interface RequestCreateProyecto {
+    name:         string;
+    estatus:      string;
+    departamento: string;
+    description:  string;
+    image:        string;
+}
+
+

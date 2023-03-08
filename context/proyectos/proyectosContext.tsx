@@ -1,20 +1,23 @@
 import { ReactNode, createContext, useContext, useState } from "react";
-import { List, ProyectoContextProps, Task, Tasks } from "./proyectosInterface";
+import { List, Proyecto, ProyectoContextProps, Task, Tasks, TipoLista } from "./proyectosInterface";
 
-export const proyectosContext = createContext({} as ProyectoContextProps)
+export const proyectosContext = createContext({} as ProyectoContextProps);
 
-export const useProyecto = () => useContext(proyectosContext) 
+export const useProyecto = () => useContext(proyectosContext);
 
 interface Props {
-    children: ReactNode
+  children: ReactNode;
 }
 
-export const ProyectosContextProvider = ({children}:Props)  => {
+export const ProyectosContextProvider = ({ children }: Props) => {
+  const [List, setList] = useState<List[]>([]);
+  const [TaskList, setTaskList] = useState<Task[]>([]);
+  const [Proyectos, setProyectos] = useState<Proyecto[]>([]);
+  const [TiposLista, setTiposLista] = useState<TipoLista[]>([]);
 
-    const [List, setList] = useState<List[]>([])
-    const [TaskList,setTaskList] = useState<Task[]>([])
-    const [Tasks,setTasks] = useState<Tasks>({})
-
-    return (<proyectosContext.Provider value={{List, setList,TaskList,setTaskList,Tasks,setTasks}}> {children}</proyectosContext.Provider>)
-
-}
+  return (
+    <proyectosContext.Provider value={{ List, setList, TaskList, setTaskList, Proyectos, setProyectos,TiposLista,setTiposLista}}>
+      {children}
+    </proyectosContext.Provider>
+  );
+};

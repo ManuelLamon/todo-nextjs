@@ -7,6 +7,10 @@ const nextConfig = {
   env: {
     API: 'http://127.0.0.1:8090',
   },
+  i18n: {
+    locales: ["es"],
+    defaultLocale: "es",
+  },
 }
 
 module.exports = nextConfig

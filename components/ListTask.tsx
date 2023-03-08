@@ -1,17 +1,16 @@
 import React, { useEffect, useState, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisV, faPlus } from "@fortawesome/free-solid-svg-icons";
 import CardTask from "./CardTask";
 import { ReactSortable } from "react-sortablejs";
 import { proyectosContext } from "../context/proyectos/proyectosContext";
 import Modal from "./Modal";
-import { RequestCreateTask } from "../interfaces/tasks";
 import ModalTask from "./modals/ModalTask";
-import { List, Task } from "../context/proyectos/proyectosInterface";
+import { List, RequestCreateTask, Task } from "../context/proyectos/proyectosInterface";
 
 export const initialCreateTaskState: RequestCreateTask = {
-  id:'',
-  titulo:"",
+  id: "",
+  titulo: "",
   descripcion: "",
   fecha_init: new Date().toISOString(),
   departamento: "",
@@ -19,7 +18,7 @@ export const initialCreateTaskState: RequestCreateTask = {
   archivos: "",
   usuario_responsable: "",
   lista: "",
-  fecha_fin: new Date().toISOString(),
+  fecha_fin: "",
   index: "0",
   proyecto: "",
   usuario_last_update: "",
@@ -27,7 +26,7 @@ export const initialCreateTaskState: RequestCreateTask = {
 
 interface Props {
   title?: string;
-  data: any;
+  data: List;
   setTaskSelect: any;
 }
 
@@ -36,9 +35,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
   const [toggler, setToggler] = useState(false);
   const [Image, setImage] = useState<string>("");
   const [dataTask, setDataTask] = useState<RequestCreateTask | Task>(initialCreateTaskState);
-
-  const { TaskList, List } = useContext(proyectosContext);
-
+  const { TaskList, List, Proyectos } = useContext(proyectosContext);
   const [TaskCopy, setTaskCopy] = useState<Task[]>([]);
 
   const onChangeData = (newState: any) => {
@@ -47,9 +44,10 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
 
   const createTask = (e: string) => {
     const list = List.find((ele) => ele.id === e) as List;
-    const dataCopy= {...initialCreateTaskState}
-    dataCopy.lista = list.id
-    dataCopy.proyecto = list.proyecto
+    const dataCopy = { ...initialCreateTaskState };
+    dataCopy.lista = list.id;
+    dataCopy.proyecto = list.proyecto;
+    dataCopy.departamento = list.departamento
     setDataTask(dataCopy);
     setIsOpenCreateTask(true);
   };
@@ -59,6 +57,12 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
     setDataTask(task);
     setIsOpenCreateTask(true);
   };
+
+  const deleteList = () => {
+    const list = data
+    TaskList.some(e => e.lista === data.id)
+  }
+
   const showImage = (e: string) => {
     setImage(e);
     setTimeout(() => {
@@ -83,29 +87,31 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
   }, [toggler]);
 
   return (
-    <div className="flex overflow-x-hidden h-[90%] w-64 gap-3 flex-col items-center p-3 card bg-secondary " id={data.id}>
+    <div className="flex overflow-x-hidden h-[90%] w-64 gap-3 flex-col items-center p-3 card bg-secondary" id={data.id}>
       <div className="w-full flex justify-between flex-row items-center z-10 sticky top-0 card bg-slate-100 pl-3">
         <h1 className="font-bold">{title}</h1>
-        <div
+        {/* <div
           onClick={() => createTask(data.id)}
-          className="p-3 cursor-pointer active:scale-90 tooltip tooltip-bottom"
+          className="p-3 cursor-pointer active:scale-90 tooltip tooltip-left"
           data-tip="crear tarea"
         >
           <FontAwesomeIcon icon={faPlus} size={"xl"} />
-        </div>
-        {/*  <div className="dropdown dropdown-end">
+        </div> */}
+        <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn btn-ghost m-1">
             <FontAwesomeIcon icon={faEllipsisV} size={"xl"} />
           </label>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-10">
             <li>
-              <a>Item 1</a>
+              <div className="w-full flex justify-between " onClick={() => createTask(data.id)}>
+                Crear Tarea <FontAwesomeIcon className=" text-green-600" icon={faPlus} size={"xl"} />
+              </div>
             </li>
             <li>
               <a>Item 2</a>
             </li>
           </ul>
-        </div> */}
+        </div>
       </div>
       <ReactSortable
         id={data.id}

@@ -2,7 +2,6 @@ import TextField from "@mui/material/TextField";
 import React, { useContext, useEffect, useState, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { sesionContext } from "../../context/sesion/sesionContext";
-import { RequestCreateTask } from "../../interfaces/tasks";
 import { PB } from "../../utils";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
@@ -17,21 +16,9 @@ import { useDropzone } from "react-dropzone";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
-import { Task } from "../../context/proyectos/proyectosInterface";
+import { RequestCreateTask, Task } from "../../context/proyectos/proyectosInterface";
 import { proyectosContext } from "../../context/proyectos/proyectosContext";
 import { initialCreateTaskState } from "../ListTask";
-
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
 
 interface Props {
   isOpen: boolean;
@@ -44,13 +31,15 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
   const { sesion } = useContext(sesionContext);
   const { TaskList, setTaskList } = useContext(proyectosContext);
   const [Usuarios, setUsuarios] = useState<autocompleteItem[]>([]);
-  const [Departamentos, setDepartamentos] = useState<any[]>([]);
   const [IsUpdate, setIsUpdate] = useState<boolean>(false);
   const [FileShow, setFileShow] = useState<string>("");
   const [File, setFile] = useState<File | null>(null);
   const consultarUsuario = async (depa: string) => {
-    const data = await PB.collection("users").getFullList(200);
-    const copy = data
+    console.log(data.departamento,'aqui');
+    const query = await PB.collection("users").getFullList(200,{
+      expand:`departamento="${data.departamento}"`
+    });
+    const copy = query
       .filter((e) => {
         if (e.departamento.includes(depa)) {
           return e;
@@ -58,18 +47,6 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
       })
       .map((e) => ({ label: e.name, id: e.id }));
     setUsuarios(copy);
-  };
-  const departamentos = async () => {
-    const datos: any[] = [];
-
-    for (const id of sesion.record.departamento) {
-      const records = await PB.collection("departamentos").getOne(id);
-      if (records) {
-        datos.push({ id: records.id, name: records.name });
-      }
-    }
-
-    setDepartamentos(datos);
   };
 
   const {
@@ -186,25 +163,21 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
     }
   };
 
+  useEffect(() => { 
+    consultarUsuario(watch('departamento'));
+  }, [watch('departamento')]);
+
+  
   useEffect(() => {
-    if (watch("departamento")) {
-      consultarUsuario(watch("departamento"));
-    }
-  }, [watch("departamento")]);
-  useEffect(() => {
-    if (Departamentos.length) {
-      setValue("departamento", Departamentos[0].id);
-    }
-  }, [Departamentos]);
-  useEffect(() => {
-    console.log(data);
-    const { usuario_responsable, proyecto, lista, index, usuario_creador, descripcion, titulo, fecha_fin, fecha_init } =
+    const { usuario_responsable, proyecto, lista, index, usuario_creador, descripcion, titulo, fecha_fin, fecha_init,departamento } =
       data;
+      console.log(data,'la data');
     if (!data.id) {
       setValue("proyecto", proyecto);
       setValue("lista", lista);
       setValue("index", "0");
       setValue("usuario_creador", sesion.record.id);
+      setValue("departamento", departamento);
     }
     if (data.id) {
       setIsUpdate(true);
@@ -218,11 +191,9 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
       setValue("descripcion", descripcion);
       setValue("fecha_fin", fecha_fin as string);
       setValue("fecha_init", fecha_init as string);
-    }
-    console.log(watch("usuario_responsable"));
-    if (isOpen) {
-      departamentos();
-    }
+      setValue("departamento", departamento);
+
+    } 
     if (!isOpen) {
       setUsuarios([]);
       reset();
@@ -340,33 +311,7 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
               />
             </div>
             <div className="w-full flex gap-3">
-              <div className=" w-1/2">
-                <Controller
-                  name="departamento"
-                  key={"departamento"}
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">Departamentos</InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Departamentos"
-                        className="w-full"
-                        {...field}
-                      >
-                        {Departamentos.map((e, index) => (
-                          <MenuItem key={index} value={e.id}>
-                            {e.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                />
-              </div>
-              <div className=" w-1/2">
+
                 <Controller
                   name="usuario_responsable"
                   key={"usuario_responsable"}
@@ -391,7 +336,7 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
                   )}
                 />
               </div>
-            </div>
+              
             <div className="w-full flex gap-3">
               <div className="w-1/2">
                 <Controller
