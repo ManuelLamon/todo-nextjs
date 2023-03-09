@@ -99,7 +99,7 @@ export interface RequestCreateTask {
     proyecto:            string;
     usuario_last_update: string;
 }
-export interface RequestCreateProyecto {
+export interface  RequestCreateProyecto {
     name:         string;
     estatus:      string;
     departamento: string;

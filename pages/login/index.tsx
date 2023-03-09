@@ -91,9 +91,8 @@ function Login() {
             >
               <div className="w-full">
                 <div className="relative -mt-16 block lg:hidden">
-                  <a
+                  <div
                     className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white text-blue-600 dark:bg-gray-900 sm:h-20 sm:w-20"
-                    href="/"
                   >
                     <span className="sr-only">Home</span>
                     <svg className="h-8 sm:h-10" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -102,7 +101,7 @@ function Login() {
                         fill="currentColor"
                       />
                     </svg>
-                  </a>
+                  </div>
 
                   <h1 className="mt-2 text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl md:text-4xl">
                     Welcome to Zacco To Do

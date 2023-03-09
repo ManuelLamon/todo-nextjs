@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import Image from 'next/image'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV, faPlus } from "@fortawesome/free-solid-svg-icons";
 import CardTask from "./CardTask";
@@ -33,7 +34,7 @@ interface Props {
 function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
   const [IsOpenCreateTask, setIsOpenCreateTask] = useState<boolean>(false);
   const [toggler, setToggler] = useState(false);
-  const [Image, setImage] = useState<string>("");
+  const [Imagen, setImagen] = useState<string>("");
   const [dataTask, setDataTask] = useState<RequestCreateTask | Task>(initialCreateTaskState);
   const { TaskList, List, Proyectos } = useContext(proyectosContext);
   const [TaskCopy, setTaskCopy] = useState<Task[]>([]);
@@ -64,7 +65,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
   }
 
   const showImage = (e: string) => {
-    setImage(e);
+    setImagen(e);
     setTimeout(() => {
       setToggler(true);
     }, 100);
@@ -76,12 +77,12 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
     return () => {
       setTaskCopy([]);
     };
-  }, [TaskList, List]);
+  }, [TaskList, List, data.id]);
 
   useEffect(() => {
     if (!toggler) {
       setTimeout(() => {
-        setImage("");
+        setImagen("");
       }, 500);
     }
   }, [toggler]);
@@ -108,7 +109,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
               </div>
             </li>
             <li>
-              <a>Item 2</a>
+              <div>Item 2</div>
             </li>
           </ul>
         </div>
@@ -133,7 +134,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
       <ModalTask isOpen={IsOpenCreateTask} setIsOpen={setIsOpenCreateTask} data={dataTask} />
       <Modal isOpen={toggler} setIsOpen={setToggler}>
         <figure className="my-5 flex justify-center items-center">
-          <img src={Image} alt="" className="h-100" />
+          <Image src={Imagen} alt="" className="h-100" />
         </figure>
       </Modal>
     </div>

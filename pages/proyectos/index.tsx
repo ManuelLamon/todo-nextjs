@@ -11,13 +11,13 @@ import ModalProyect from "../../components/modals/ModalProyect";
 
 export const initialCreateProyecto = {
   name: "",
-  estatus: "",
+  estatus: "tgconbjd55q2stw",
   departamento: "",
   description: "",
   image: "",
 };
 
-function index() {
+function Index() {
   const [dataProyect, setDataProyect] = useState<RequestCreateProyecto | Proyecto>(initialCreateProyecto);
   const [IsOpenCreateProyect, setIsOpenCreateProyect] = useState<boolean>(false);
   const { Proyectos, setProyectos } = useContext(proyectosContext);
@@ -32,7 +32,7 @@ function index() {
       setProyectos([...Proyectos, ...records]);
     }
   };
-  const createProyect = (e: string) => {
+  const createProyect = () => {
     setDataProyect(initialCreateProyecto);
     setIsOpenCreateProyect(true);
   };
@@ -52,6 +52,7 @@ function index() {
     <ScreenContainer>
       <h1 className=" text-4xl font-bold mb-4">Proyectos</h1>
       <div className="flex overflow-y-hidden h-full gap-3 w-fit p-3">
+        {!Proyectos.length && <p>No tienes Proyectos creados</p>}
         {Proyectos.map((proyecto, index) => (
           <CardProyect proyect={proyecto} proyectIndex={index} key={index} />
         ))}
@@ -68,4 +69,4 @@ function index() {
   );
 }
 
-export default index;
+export default Index;

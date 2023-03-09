@@ -235,9 +235,9 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
             >
               <input {...getInputProps()} />
               {isDragActive ? (
-                <p>Drop the files here ...</p>
+                <p>Suelta la imagen aqui ...</p>
               ) : (
-                <p>Drag 'n' drop some files here, or click to select files</p>
+                <p>Arrastra la imagen aqui o haz click para seleccionarla</p>
               )}
             </div>
           )}

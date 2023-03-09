@@ -80,9 +80,9 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
     }
   });
   useEffect(() => {
+    queryTiposLista();
     if (List.length) {
         setValue("index", List.length.toString());
-        queryTiposLista();
     }
   }, [List]);
 
@@ -101,6 +101,7 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
     if (!isOpen) {
       reset();
       setIsUpdate(false);
+      setTiposLista([])
     }
   }, [isOpen, data]);
   useEffect(() => {

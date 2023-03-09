@@ -24,20 +24,20 @@ function array_move(arr: any[], old_index: number, new_index: number) {
 }
 
 export const initialCreateListState: RequestCreateList = {
-  id:'',
-  name:"",
+  id: "",
+  name: "",
   usuario_creador: "",
   index: "0",
   proyecto: "",
   usuario_last_update: "",
-  tipo:""
+  tipo: "",
 };
 
-function projectId() {
+function ProjectId() {
   const router = useRouter();
   const id = router.query.projectId;
   const { List, setList, TaskList, setTaskList } = useContext(proyectosContext);
-  const [IsOpenCreateList, setIsOpenCreateList] = useState<boolean>(false)
+  const [IsOpenCreateList, setIsOpenCreateList] = useState<boolean>(false);
   const { sesion } = useContext(sesionContext);
   const [dataList, setDataList] = useState<RequestCreateList | List>(initialCreateListState);
   const DataQuery = async () => {
@@ -55,9 +55,9 @@ function projectId() {
   const handleTaskSelect = async (e: any, elementHtml: SortableEvent) => {
     try {
       const data = TaskList.find((ele) => ele.id === e) as Task;
-      const dataFilter = TaskList.filter(
-        (ele) => ele.id !== e && ele.lista === elementHtml.to.id
-      ).sort((a, b) => Number(a.index) - Number(b.index));
+      const dataFilter = TaskList.filter((ele) => ele.id !== e && ele.lista === elementHtml.to.id).sort(
+        (a, b) => Number(a.index) - Number(b.index)
+      );
       data.lista = elementHtml.to.id;
       data.index = elementHtml.newIndex as number;
       data.usuario_last_update = sesion.record.id;
@@ -75,9 +75,7 @@ function projectId() {
   const handleListSelect = async (e: any, elementHtml: SortableEvent) => {
     try {
       const data = List.find((ele) => ele.id === e) as List;
-      const dataFilter = List.filter((ele) => ele.id !== e).sort(
-        (a, b) => Number(a.index) - Number(b.index)
-      );
+      const dataFilter = List.filter((ele) => ele.id !== e).sort((a, b) => Number(a.index) - Number(b.index));
       data.index = elementHtml.newIndex as number;
       data.usuario_last_update = sesion.record.id;
       dataFilter.splice(Number(elementHtml.newIndex), 0, data);
@@ -97,7 +95,7 @@ function projectId() {
       }
       if (e.action === "create") {
         const data: Task[] = [...TaskList];
-        data.unshift(e.record as any)
+        data.unshift(e.record as any);
         let list = data.filter((ele) => ele.lista === e.record.lista);
         const dato = list.findIndex((ele) => ele.id === e.record.id);
         if (dato) {
@@ -118,7 +116,7 @@ function projectId() {
         return;
       }
       if (e.action === "update") {
-        console.log(e,'aqui');
+        console.log(e, "aqui");
         const data: Task[] = TaskList.map((task) => {
           if (task.id === e.record.id) {
             return e.record as any;
@@ -143,7 +141,6 @@ function projectId() {
         }
         setTaskList(data);
         return;
-        
       }
     });
   };
@@ -191,7 +188,7 @@ function projectId() {
   useEffect(() => {
     if (id) {
       DataQuery();
-      setDataList({...dataList,proyecto:(id as string)})
+      setDataList({ ...dataList, proyecto: id as string });
     }
     return () => {
       setList([]);
@@ -203,23 +200,22 @@ function projectId() {
     <ScreenContainer>
       <h1 className=" text-4xl font-bold mb-4">Tareas</h1>
       <div className="">
-        <ReactSortable
-          list={List}
-          setList={setList}
-          animation={200}
-          easing="ease-out"
-          className="flex overflow-x-scroll h-screen overflow-y-hidden gap-3 w-fit"
-          onChange={(e: any) => handleListSelect(e.item.id, e)}
-        >
-          {List.map((value: any, index) => (
-            <ListTask
-              title={value.name}
-              data={value}
-              key={index + "asdcs"}
-              setTaskSelect={handleTaskSelect}
-            />
-          ))}
-        </ReactSortable>
+        {!List.length 
+        ? (<p>No tienes Proyectos creados</p>)   
+        : (
+          <ReactSortable
+            list={List}
+            setList={setList}
+            animation={200}
+            easing="ease-out"
+            className="flex overflow-x-scroll h-screen overflow-y-hidden gap-3 w-fit"
+            onChange={(e: any) => handleListSelect(e.item.id, e)}
+          >
+            {List.map((value: any, index) => (
+              <ListTask title={value.name} data={value} key={index + "asdcs"} setTaskSelect={handleTaskSelect} />
+            ))}
+          </ReactSortable>
+        )}
       </div>
       <button
         data-tip="crear lista"
@@ -228,9 +224,9 @@ function projectId() {
       >
         <FontAwesomeIcon icon={faPlus} />
       </button>
-      <ModalList data={dataList} isOpen={IsOpenCreateList} setIsOpen={setIsOpenCreateList}/>
+      <ModalList data={dataList} isOpen={IsOpenCreateList} setIsOpen={setIsOpenCreateList} />
     </ScreenContainer>
   );
 }
 
-export default projectId;
+export default ProjectId;

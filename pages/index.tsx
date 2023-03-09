@@ -1,9 +1,7 @@
-import { Inter } from '@next/font/google'
 import ScreenContainer from '../components/ScreenContainer'
-import ListTask from '../components/ListTask'
 import { PB } from '../utils'
 import { useState, useEffect } from 'react';
-import { Task } from '../interfaces/tasks'
+import { Task } from '../context/proyectos/proyectosInterface';
 
 export default function Home() {
   const [List, setList] = useState<any[]>([])
