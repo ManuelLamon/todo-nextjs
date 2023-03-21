@@ -31,7 +31,6 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
     setIsOpen(false);
   };
   const {
-    register,
     handleSubmit,
     control,
     watch,
@@ -80,15 +79,14 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
     }
   });
   useEffect(() => {
-    queryTiposLista();
     if (List.length) {
         setValue("index", List.length.toString());
     }
   }, [List]);
 
   useEffect(() => {
-    console.log(data);
-    const { proyecto } = data;
+    console.log(data,'ModalList');
+    const { proyecto, departamento} = data;
     if (!data.id) {
       setValue("usuario_creador", sesion.record.id);
     }
@@ -97,6 +95,8 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
     }
     if (isOpen) {
       setValue("proyecto", proyecto);
+      setValue("departamento", departamento);
+      queryTiposLista();
     }
     if (!isOpen) {
       reset();
@@ -104,6 +104,7 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
       setTiposLista([])
     }
   }, [isOpen, data]);
+
   useEffect(() => {
     if(watch('tipo')){
         if(watch('tipo') !== "evcwxmojxt0dr1x"){
@@ -144,7 +145,7 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
             className="card-body flex flex-col gap-3 w-full justify-start items-center"
             onSubmit={onSubmitData}
           >
-            <div className="w-full">
+            <div className={watch('tipo') !== "evcwxmojxt0dr1x" ? "w-full animate__animated animate__faster animate__fadeOut" : "w-full animate__animated animate__faster  animate__fadeIn" }>
               <Controller
                 name="name"
                 key={"name"}

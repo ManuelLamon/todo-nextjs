@@ -54,8 +54,8 @@ export interface Proyecto {
     id:             string;
     collectionId:   string;
     collectionName: string;
-    created:        Date;
-    updated:        Date;
+    created:        Date | string;
+    updated:        Date | string;
     name:           string;
     estatus:        string;
     departamento:   string;
@@ -83,6 +83,7 @@ export interface RequestCreateList {
     usuario_last_update: string;
     tipo:                string;
     usuario_creador:     string;
+    departamento:        string;
 }
 export interface RequestCreateTask {
     id:                  string;

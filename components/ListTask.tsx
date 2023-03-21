@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useContext } from "react";
-import Image from 'next/image'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisV, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisV, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import CardTask from "./CardTask";
 import { ReactSortable } from "react-sortablejs";
 import { proyectosContext } from "../context/proyectos/proyectosContext";
 import Modal from "./Modal";
 import ModalTask from "./modals/ModalTask";
 import { List, RequestCreateTask, Task } from "../context/proyectos/proyectosInterface";
+import Swal from "sweetalert2";
+import { PB } from "../utils";
 
 export const initialCreateTaskState: RequestCreateTask = {
   id: "",
@@ -36,7 +37,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
   const [toggler, setToggler] = useState(false);
   const [Imagen, setImagen] = useState<string>("");
   const [dataTask, setDataTask] = useState<RequestCreateTask | Task>(initialCreateTaskState);
-  const { TaskList, List, Proyectos } = useContext(proyectosContext);
+  const { TaskList, List, setList } = useContext(proyectosContext);
   const [TaskCopy, setTaskCopy] = useState<Task[]>([]);
 
   const onChangeData = (newState: any) => {
@@ -48,7 +49,8 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
     const dataCopy = { ...initialCreateTaskState };
     dataCopy.lista = list.id;
     dataCopy.proyecto = list.proyecto;
-    dataCopy.departamento = list.departamento
+    dataCopy.departamento = list.departamento;
+    console.log(dataCopy,'dataCopy');
     setDataTask(dataCopy);
     setIsOpenCreateTask(true);
   };
@@ -60,8 +62,50 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
   };
 
   const deleteList = () => {
-    const list = data
-    TaskList.some(e => e.lista === data.id)
+    Swal.fire({
+      title: 'Estas seguro?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      confirmButtonColor:"#80BC00",
+      cancelButtonColor:"#F87272",
+      customClass:{
+        popup:'rounded-xl',
+        confirmButton:'btn btn-primary',
+        cancelButton:'btn btn-error',
+      }
+    }).then( async (result) => {
+      if (result.isConfirmed) {
+        const existeTask = TaskList.some(e => e.lista === data.id)
+        if(existeTask){
+          Swal.fire(
+            {title:'Esta lista tiene tareas',
+            text:'no se puede eliminar la lista porque tiene tareas',
+            icon:'error',
+            confirmButtonColor:"#80BC00",
+            customClass:{
+              popup:'rounded-xl',
+            }}
+          )
+
+          return 
+        }
+        Swal.fire(
+          {title:'Listo!',
+          icon:'success',
+          confirmButtonColor:"#80BC00",
+          customClass:{
+            popup:'rounded-xl',
+          }}
+        )
+        const listCopy = [...List].filter(e => e.id != data.id).map((value, index) => ({...value,index: index}))
+        PB.collection("listas").delete(data.id)
+        for (const element of listCopy) {
+          await PB.collection("listas").update(element.id, element);
+        }
+        setList(listCopy)
+      }
+    })
   }
 
   const showImage = (e: string) => {
@@ -109,7 +153,9 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
               </div>
             </li>
             <li>
-              <div>Item 2</div>
+              <div className="w-full flex justify-between " onClick={() => deleteList()} >
+                Eliminar Lista  <FontAwesomeIcon className=" text-red-600" icon={faTrash} size={"lg"} />
+              </div>
             </li>
           </ul>
         </div>
@@ -134,7 +180,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
       <ModalTask isOpen={IsOpenCreateTask} setIsOpen={setIsOpenCreateTask} data={dataTask} />
       <Modal isOpen={toggler} setIsOpen={setToggler}>
         <figure className="my-5 flex justify-center items-center">
-          <Image src={Imagen} alt="" className="h-100" />
+          <img src={Imagen} alt="" className="h-100"/>
         </figure>
       </Modal>
     </div>

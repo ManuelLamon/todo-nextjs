@@ -6,7 +6,7 @@ import ListTask from "../../components/ListTask";
 import ScreenContainer from "../../components/ScreenContainer";
 import { ReactSortable, SortableEvent } from "react-sortablejs";
 import { proyectosContext } from "../../context/proyectos/proyectosContext";
-import { List, RequestCreateList, Task } from "../../context/proyectos/proyectosInterface";
+import { List, Proyecto, RequestCreateList, Task } from "../../context/proyectos/proyectosInterface";
 import { sesionContext } from "../../context/sesion/sesionContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -31,12 +31,26 @@ export const initialCreateListState: RequestCreateList = {
   proyecto: "",
   usuario_last_update: "",
   tipo: "",
+  departamento:"",
+};
+export const initialCreateProyecto: Proyecto = {
+  id:             "",
+    collectionId:   "",
+    collectionName: "",
+    created:         "",
+    updated:         "",
+    name:           "",
+    estatus:        "",
+    departamento:   "",
+    description:    "",
+    image:          "",
 };
 
 function ProjectId() {
   const router = useRouter();
   const id = router.query.projectId;
-  const { List, setList, TaskList, setTaskList } = useContext(proyectosContext);
+  const [Proyecto, setProyecto] = useState<Proyecto>(initialCreateProyecto)
+  const { List, setList, TaskList, setTaskList, Proyectos } = useContext(proyectosContext);
   const [IsOpenCreateList, setIsOpenCreateList] = useState<boolean>(false);
   const { sesion } = useContext(sesionContext);
   const [dataList, setDataList] = useState<RequestCreateList | List>(initialCreateListState);
@@ -93,6 +107,7 @@ function ProjectId() {
       if (e.record.usuario_last_update === sesion.record.id) {
         return;
       }
+      console.log(e.action);
       if (e.action === "create") {
         const data: Task[] = [...TaskList];
         data.unshift(e.record as any);
@@ -142,6 +157,29 @@ function ProjectId() {
         setTaskList(data);
         return;
       }
+      if (e.action === "delete") {
+        console.log(e, "aqui");
+        const data: Task[] = TaskList.filter(ele => ele.id != e.record.id);
+        let list = TaskList.filter((ele) => ele.lista === e.record.lista && ele.id != e.record.id);
+        const dato = list.findIndex((ele) => ele.id === e.record.id);
+        if (dato) {
+          list = list.map((value, index) => ({
+            ...value,
+            index: index,
+          }));
+        }
+        for (const ele of list) {
+          for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if (ele.id === element.id) {
+              data[i] = ele;
+            }
+          }
+        }
+        setTaskList(data);
+        return;
+      }
+
     });
   };
 
@@ -152,6 +190,27 @@ function ProjectId() {
   const subList = () => {
     PB.collection("listas").subscribe("*", function (e) {
       if (e.record.usuario_last_update === sesion.record.id) {
+        return;
+      }
+      if (e.record.proyecto !== id) {
+        return;
+      }
+
+      if (e.action === "create") {
+        const copy = [...List];
+        const item = e.record as any;
+        copy.push(item);
+        setList(copy);
+        return;
+      }
+      if (e.action === "delete") {
+        setList(
+          List.filter((list) => {
+            if (list.id !== e.record.id) {
+              return e.record as any;
+            }
+          }).sort((a, b) => Number(a.index) - Number(b.index))
+        );
         return;
       }
       if (e.action === "update") {
@@ -187,12 +246,16 @@ function ProjectId() {
 
   useEffect(() => {
     if (id) {
+      const DataProyecto = Proyectos.find(ele => ele.id == id) as Proyecto
+      console.log(DataProyecto.departamento,'DataProyecto');
+      console.log(Proyectos,'Proyectos');
       DataQuery();
-      setDataList({ ...dataList, proyecto: id as string });
+      setDataList({ ...dataList, proyecto: id as string,departamento: DataProyecto.departamento});
     }
     return () => {
       setList([]);
       setTaskList([]);
+      setProyecto(initialCreateProyecto)
     };
   }, [id]);
 
@@ -200,9 +263,9 @@ function ProjectId() {
     <ScreenContainer>
       <h1 className=" text-4xl font-bold mb-4">Tareas</h1>
       <div className="">
-        {!List.length 
-        ? (<p>No tienes Proyectos creados</p>)   
-        : (
+        {!List.length ? (
+          <p>No tienes Proyectos creados</p>
+        ) : (
           <ReactSortable
             list={List}
             setList={setList}
@@ -218,6 +281,7 @@ function ProjectId() {
         )}
       </div>
       <button
+        title="crear lista"
         data-tip="crear lista"
         onClick={() => setIsOpenCreateList(true)}
         className=" fixed z-90 bottom-4 right-5  w-16 h-16 rounded-full drop-shadow-lg flex justify-center items-center text-white text-3xl btn btn-primary tooltip tooltip-left"

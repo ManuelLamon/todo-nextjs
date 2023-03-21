@@ -23,15 +23,6 @@ function Index() {
   const { Proyectos, setProyectos } = useContext(proyectosContext);
   const { sesion } = useContext(sesionContext);
 
-  const DataQuery = async () => {
-    for (const depa of sesion.record.departamento) {
-      const records = (await PB.collection("proyectos").getFullList(200, {
-        filter: `departamento="${depa}"`,
-      })) as Proyecto[];
-      console.log(records, "aquii");
-      setProyectos([...Proyectos, ...records]);
-    }
-  };
   const createProyect = () => {
     setDataProyect(initialCreateProyecto);
     setIsOpenCreateProyect(true);
@@ -43,11 +34,42 @@ function Index() {
     setIsOpenCreateProyect(true);
   };
 
+  const sub = () => {
+    PB.collection("proyectos").subscribe("*", function (e) {
+      if (e.record.usuario_last_update === sesion.record.id) {
+        return;
+      }
+      if (!sesion.record.departamento.includes(e.record.departamento)) {
+        return;
+      }
+
+      if (e.action === "create") {
+        return;
+      }
+      if (e.action === "delete") {
+        return;
+      }
+      if (e.action === "update") {
+        return;
+      }
+    });
+  };
+
+  const unsubs = () => {
+    PB.collection("proyectos").unsubscribe();
+  };
+
   useEffect(() => {
-    if (!Proyectos.length) {
-      DataQuery();
+    if (Proyectos.length) {
+      sub();
     }
-  }, [sesion]);
+  }, [Proyectos]);
+
+  useEffect(() => {
+    return () => {
+      unsubs();
+    };
+  }, []);
   return (
     <ScreenContainer>
       <h1 className=" text-4xl font-bold mb-4">Proyectos</h1>
@@ -58,13 +80,14 @@ function Index() {
         ))}
       </div>
       <button
+        title="crear-proyecto"
         onClick={() => createProyect()}
         data-tip="crear proyecto"
         className=" fixed z-90 bottom-4 right-5  w-16 h-16 rounded-full drop-shadow-lg flex justify-center items-center text-white text-3xl btn btn-primary tooltip  tooltip-left"
       >
         <FontAwesomeIcon icon={faPlus} />
       </button>
-      <ModalProyect data={dataProyect} isOpen={IsOpenCreateProyect} setIsOpen={setIsOpenCreateProyect}/>
+      <ModalProyect data={dataProyect} isOpen={IsOpenCreateProyect} setIsOpen={setIsOpenCreateProyect} />
     </ScreenContainer>
   );
 }

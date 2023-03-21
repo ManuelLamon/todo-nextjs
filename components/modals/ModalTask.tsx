@@ -34,6 +34,7 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
   const [IsUpdate, setIsUpdate] = useState<boolean>(false);
   const [FileShow, setFileShow] = useState<string>("");
   const [File, setFile] = useState<File | null>(null);
+
   const consultarUsuario = async (depa: string) => {
     console.log(data.departamento,'aqui');
     const query = await PB.collection("users").getFullList(200,{
@@ -50,7 +51,6 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
   };
 
   const {
-    register,
     handleSubmit,
     control,
     watch,
@@ -375,10 +375,7 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
             </div>
             <div className="h-1/6 flex gap-4 justify-end items-end ">
               <button className="btn btn-primary font-bold" type="submit">
-                Enviar
-              </button>
-              <button className="btn btn-error font-bold" type="submit">
-                Eliminar
+                { !IsUpdate ? 'Enviar' : 'Actualizar'}
               </button>
             </div>
           </form>
