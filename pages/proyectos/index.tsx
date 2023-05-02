@@ -8,6 +8,7 @@ import { sesionContext } from "../../context/sesion/sesionContext";
 import { proyectosContext } from "../../context/proyectos/proyectosContext";
 import { Proyecto, RequestCreateProyecto } from "../../context/proyectos/proyectosInterface";
 import ModalProyect from "../../components/modals/ModalProyect";
+import ReactPaginate from "react-paginate";
 
 export const initialCreateProyecto = {
   name: "",
@@ -22,6 +23,12 @@ function Index() {
   const [IsOpenCreateProyect, setIsOpenCreateProyect] = useState<boolean>(false);
   const { Proyectos, setProyectos } = useContext(proyectosContext);
   const { sesion } = useContext(sesionContext);
+  const [itemOffset, setItemOffset] = useState(0);
+
+  const endOffset = itemOffset + 12;
+  console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+  const currentItems = Proyectos.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(Proyectos.length / 12);
 
   const createProyect = () => {
     setDataProyect(initialCreateProyecto);
@@ -34,22 +41,32 @@ function Index() {
     setIsOpenCreateProyect(true);
   };
 
-  const sub = () => {
-    PB.collection("proyectos").subscribe("*", function (e) {
-      if (e.record.usuario_last_update === sesion.record.id) {
-        return;
-      }
-      if (!sesion.record.departamento.includes(e.record.departamento)) {
-        return;
-      }
+  const handlePageClick = (event: any) => {
+    const newOffset = (event.selected * 12) % Proyectos.length;
+    console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
+    setItemOffset(newOffset);
+  };
 
-      if (e.action === "create") {
+  const sub = () => {
+    PB.collection("proyectos").subscribe("*", function ({ record, action }) {
+      if (record.usuario_last_update === sesion.record.id) {
         return;
       }
-      if (e.action === "delete") {
+      if (!sesion.record.departamento.includes(record.departamento)) {
         return;
       }
-      if (e.action === "update") {
+      const data: any = record;
+
+      if (action === "create") {
+        setProyectos([...Proyectos, data]);
+        return;
+      }
+      if (action === "delete") {
+        setProyectos(Proyectos.filter((ele) => ele.id !== data.id));
+        return;
+      }
+      if (action === "update") {
+        setProyectos(Proyectos.map((ele) => (ele.id === data.id ? data : ele)));
         return;
       }
     });
@@ -64,7 +81,6 @@ function Index() {
       sub();
     }
   }, [Proyectos]);
-
   useEffect(() => {
     return () => {
       unsubs();
@@ -73,12 +89,34 @@ function Index() {
   return (
     <ScreenContainer>
       <h1 className=" text-4xl font-bold mb-4">Proyectos</h1>
-      <div className="flex overflow-y-hidden h-full gap-3 w-fit p-3">
-        {!Proyectos.length && <p>No tienes Proyectos creados</p>}
-        {Proyectos.map((proyecto, index) => (
-          <CardProyect proyect={proyecto} proyectIndex={index} key={index} />
-        ))}
+      <div
+        className="grid xl:grid-cols-4 md:grid-cols-2 xl:grid-rows-4 overflow-x-auto h-[95%] gap-3 w-full p-4 relative"
+        style={{ gridAutoRows: "100px 100px 100px" }}
+      >
+        {!currentItems.length ? (
+          <p>No tienes Proyectos creados</p>
+        ) : (
+          currentItems.map((proyecto, index) => <CardProyect proyect={proyecto} proyectIndex={index} key={index} />)
+        )}
       </div>
+      {pageCount > 1 ? (
+        <ReactPaginate
+          className="absolute bottom-4 left-1/2 btn-group"
+          breakLabel="..."
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={5}
+          pageCount={pageCount}
+          nextClassName="btn"
+          previousClassName="btn"
+          pageClassName="btn"
+          nextLinkClassName="h-full flex justify-center items-center"
+          previousLinkClassName="h-full flex justify-center items-center"
+          pageLinkClassName="h-full w-3 flex justify-center items-center"
+          activeClassName="btn-active"
+          nextLabel="Sig »"
+          previousLabel="« Previo"
+        />
+      ) : null}
       <button
         title="crear-proyecto"
         onClick={() => createProyect()}

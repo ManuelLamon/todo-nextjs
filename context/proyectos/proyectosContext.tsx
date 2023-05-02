@@ -18,12 +18,12 @@ export const ProyectosContextProvider = ({ children }: Props) => {
   const [TiposLista, setTiposLista] = useState<TipoLista[]>([]);
   const { sesion } = useContext(sesionContext);
 
-  
   const DataQuery = async () => {
+    console.log(sesion.record.departamento);
     for (const depa of sesion.record.departamento) {
-      const records = (await PB.collection("proyectos").getFullList(200, {
+      const records: Proyecto[] = await PB.collection("proyectos").getFullList(200, {
         filter: `departamento="${depa}"`,
-      })) as Proyecto[];
+      });
       console.log(records, "aquii");
       setProyectos([...Proyectos, ...records]);
     }
@@ -35,7 +35,9 @@ export const ProyectosContextProvider = ({ children }: Props) => {
     }
   }, [sesion]);
   return (
-    <proyectosContext.Provider value={{ List, setList, TaskList, setTaskList, Proyectos, setProyectos,TiposLista,setTiposLista}}>
+    <proyectosContext.Provider
+      value={{ List, setList, TaskList, setTaskList, Proyectos, setProyectos, TiposLista, setTiposLista }}
+    >
       {children}
     </proyectosContext.Provider>
   );

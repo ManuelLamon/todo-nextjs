@@ -45,41 +45,41 @@ function ModalProyect({ data, isOpen, setIsOpen }: Props) {
   const onSubmitData = handleSubmit(async (formInfo) => {
     try {
       console.log(formInfo);
-      setLoader(true)
-      const record = (await PB.collection("proyectos").create(formInfo)) as Proyecto
-      setProyectos([...Proyectos,record])
-      setLoader(false)
-      closeModal()
+      setLoader(true);
+      const record = (await PB.collection("proyectos").create(formInfo)) as Proyecto;
+      setProyectos([...Proyectos, record]);
+      setLoader(false);
+      closeModal();
     } catch (error) {
-      setLoader(false)
+      setLoader(false);
       console.log(error);
       alert(error);
     }
   });
   const consultaImg = async () => {
-    const records = await PB.collection("archivos").getFullList()
-    const img = records[Math.floor(Math.random()*records.length)];
-    setValue('image', img.id)
-  }
+    const records = await PB.collection("archivos").getFullList();
+    const img = records[Math.floor(Math.random() * records.length)];
+    setValue("image", img.id);
+  };
   const consultaDepartamento = async () => {
-    const records = await PB.collection("departamentos").getFullList()
-    const filter = []
+    const records = await PB.collection("departamentos").getFullList();
+    const filter = [];
     for (const depa of sesion.record.departamento) {
-      const ele = records.find( e => e.id === depa)
-      filter.push(ele)
+      const ele = records.find((e) => e.id === depa);
+      filter.push(ele);
     }
     console.log(filter);
-    setDepartamentos(filter)
-  }
+    setDepartamentos(filter);
+  };
   useEffect(() => {
-    if(isOpen){
-      consultaImg()
-      consultaDepartamento()
-    }else{
-      reset()
+    if (isOpen) {
+      consultaImg();
+      consultaDepartamento();
+    } else {
+      reset();
     }
-  }, [isOpen])
-  
+  }, [isOpen]);
+
   return (
     <Modal
       aria-labelledby="transition-modal-title"
@@ -153,29 +153,29 @@ function ModalProyect({ data, isOpen, setIsOpen }: Props) {
               />
             </div>
             <div className="w-full">
-            <Controller
-                  name="departamento"
-                  key={"departamento"}
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">Responsable</InputLabel>
-                      <Select
-                        labelId="departamento-input"
-                        id="departamento-input"
-                        label="Departamento"
-                        className="w-full"
-                        {...field}
-                      >
-                        {departamentos.map((e, index) => (
-                          <MenuItem key={index} value={e.id}>
-                            {e.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                />
+              <Controller
+                name="departamento"
+                key={"departamento"}
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">Departamento</InputLabel>
+                    <Select
+                      labelId="departamento-input"
+                      id="departamento-input"
+                      label="Departamento"
+                      className="w-full"
+                      {...field}
+                    >
+                      {departamentos.map((e, index) => (
+                        <MenuItem key={index} value={e.id}>
+                          {e.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+              />
             </div>
             <div className="h-1/6 flex gap-4 justify-end items-end ">
               <button className="btn btn-primary font-bold" type="submit">

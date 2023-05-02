@@ -9,6 +9,7 @@ import ModalTask from "./modals/ModalTask";
 import { List, RequestCreateTask, Task } from "../context/proyectos/proyectosInterface";
 import Swal from "sweetalert2";
 import { PB } from "../utils";
+import Image from "next/image";
 
 export const initialCreateTaskState: RequestCreateTask = {
   id: "",
@@ -21,6 +22,7 @@ export const initialCreateTaskState: RequestCreateTask = {
   usuario_responsable: "",
   lista: "",
   fecha_fin: "",
+  death_line: "",
   index: "0",
   proyecto: "",
   usuario_last_update: "",
@@ -50,7 +52,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
     dataCopy.lista = list.id;
     dataCopy.proyecto = list.proyecto;
     dataCopy.departamento = list.departamento;
-    console.log(dataCopy,'dataCopy');
+    console.log(dataCopy, "dataCopy");
     setDataTask(dataCopy);
     setIsOpenCreateTask(true);
   };
@@ -63,50 +65,50 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
 
   const deleteList = () => {
     Swal.fire({
-      title: 'Estas seguro?',
-      icon: 'warning',
+      title: "Estas seguro?",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'Ok',
-      confirmButtonColor:"#80BC00",
-      cancelButtonColor:"#F87272",
-      customClass:{
-        popup:'rounded-xl',
-        confirmButton:'btn btn-primary',
-        cancelButton:'btn btn-error',
-      }
-    }).then( async (result) => {
+      confirmButtonText: "Ok",
+      confirmButtonColor: "#80BC00",
+      cancelButtonColor: "#F87272",
+      customClass: {
+        popup: "rounded-xl",
+        confirmButton: "btn btn-primary",
+        cancelButton: "btn btn-error",
+      },
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const existeTask = TaskList.some(e => e.lista === data.id)
-        if(existeTask){
-          Swal.fire(
-            {title:'Esta lista tiene tareas',
-            text:'no se puede eliminar la lista porque tiene tareas',
-            icon:'error',
-            confirmButtonColor:"#80BC00",
-            customClass:{
-              popup:'rounded-xl',
-            }}
-          )
+        const existeTask = TaskList.some((e) => e.lista === data.id);
+        if (existeTask) {
+          Swal.fire({
+            title: "Esta lista tiene tareas",
+            text: "no se puede eliminar la lista porque tiene tareas",
+            icon: "error",
+            confirmButtonColor: "#80BC00",
+            customClass: {
+              popup: "rounded-xl",
+            },
+          });
 
-          return 
+          return;
         }
-        Swal.fire(
-          {title:'Listo!',
-          icon:'success',
-          confirmButtonColor:"#80BC00",
-          customClass:{
-            popup:'rounded-xl',
-          }}
-        )
-        const listCopy = [...List].filter(e => e.id != data.id).map((value, index) => ({...value,index: index}))
-        PB.collection("listas").delete(data.id)
+        Swal.fire({
+          title: "Listo!",
+          icon: "success",
+          confirmButtonColor: "#80BC00",
+          customClass: {
+            popup: "rounded-xl",
+          },
+        });
+        const listCopy = [...List].filter((e) => e.id != data.id).map((value, index) => ({ ...value, index: index }));
+        PB.collection("listas").delete(data.id);
         for (const element of listCopy) {
           await PB.collection("listas").update(element.id, element);
         }
-        setList(listCopy)
+        setList(listCopy);
       }
-    })
-  }
+    });
+  };
 
   const showImage = (e: string) => {
     setImagen(e);
@@ -153,8 +155,8 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
               </div>
             </li>
             <li>
-              <div className="w-full flex justify-between " onClick={() => deleteList()} >
-                Eliminar Lista  <FontAwesomeIcon className=" text-red-600" icon={faTrash} size={"lg"} />
+              <div className="w-full flex justify-between " onClick={() => deleteList()}>
+                Eliminar Lista <FontAwesomeIcon className=" text-red-600" icon={faTrash} size={"lg"} />
               </div>
             </li>
           </ul>
@@ -180,7 +182,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
       <ModalTask isOpen={IsOpenCreateTask} setIsOpen={setIsOpenCreateTask} data={dataTask} />
       <Modal isOpen={toggler} setIsOpen={setToggler}>
         <figure className="my-5 flex justify-center items-center">
-          <img src={Imagen} alt="" className="h-100"/>
+          <Image src={Imagen} alt={"que haces leyendo esto tonto"} className="static" fill />
         </figure>
       </Modal>
     </div>

@@ -1,11 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['images.unsplash.com',"placeimg.com",'192.168.3.140'],
+    domains: ['todo.alocashfintech.com', 'images.unsplash.com'],
   },
   reactStrictMode: false,
   env: {
-    API: 'http://192.168.3.140:8090',
+    API: 'http://todo.alocashfintech.com',
+    API2: 'http://todo.alocashfintech.com/api'
   },
   i18n: {
     locales: ["es"],

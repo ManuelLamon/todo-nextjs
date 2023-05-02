@@ -31,25 +31,25 @@ export const initialCreateListState: RequestCreateList = {
   proyecto: "",
   usuario_last_update: "",
   tipo: "",
-  departamento:"",
+  departamento: "",
 };
 export const initialCreateProyecto: Proyecto = {
-  id:             "",
-    collectionId:   "",
-    collectionName: "",
-    created:         "",
-    updated:         "",
-    name:           "",
-    estatus:        "",
-    departamento:   "",
-    description:    "",
-    image:          "",
+  id: "",
+  collectionId: "",
+  collectionName: "",
+  created: "",
+  updated: "",
+  name: "",
+  estatus: "",
+  departamento: "",
+  description: "",
+  image: "",
 };
 
 function ProjectId() {
   const router = useRouter();
   const id = router.query.projectId;
-  const [Proyecto, setProyecto] = useState<Proyecto>(initialCreateProyecto)
+  const [Proyecto, setProyecto] = useState<Proyecto>(initialCreateProyecto);
   const { List, setList, TaskList, setTaskList, Proyectos } = useContext(proyectosContext);
   const [IsOpenCreateList, setIsOpenCreateList] = useState<boolean>(false);
   const { sesion } = useContext(sesionContext);
@@ -69,11 +69,20 @@ function ProjectId() {
   const handleTaskSelect = async (e: any, elementHtml: SortableEvent) => {
     try {
       const data = TaskList.find((ele) => ele.id === e) as Task;
+
+      if (data.lista === "z0a8eenpfs9gtqr") {
+        return;
+      }
       const dataFilter = TaskList.filter((ele) => ele.id !== e && ele.lista === elementHtml.to.id).sort(
         (a, b) => Number(a.index) - Number(b.index)
       );
       data.lista = elementHtml.to.id;
       data.index = elementHtml.newIndex as number;
+      if (elementHtml.to.id === "z0a8eenpfs9gtqr") {
+        data.death_line = new Date().toISOString();
+      }
+      console.log(elementHtml.to.id);
+
       data.usuario_last_update = sesion.record.id;
       dataFilter.splice(Number(elementHtml.newIndex), 0, data);
       const dataIndex = dataFilter.map((value, index) => ({ ...value, index: index }));
@@ -159,7 +168,7 @@ function ProjectId() {
       }
       if (e.action === "delete") {
         console.log(e, "aqui");
-        const data: Task[] = TaskList.filter(ele => ele.id != e.record.id);
+        const data: Task[] = TaskList.filter((ele) => ele.id != e.record.id);
         let list = TaskList.filter((ele) => ele.lista === e.record.lista && ele.id != e.record.id);
         const dato = list.findIndex((ele) => ele.id === e.record.id);
         if (dato) {
@@ -179,7 +188,6 @@ function ProjectId() {
         setTaskList(data);
         return;
       }
-
     });
   };
 
@@ -246,25 +254,28 @@ function ProjectId() {
 
   useEffect(() => {
     if (id) {
-      const DataProyecto = Proyectos.find(ele => ele.id == id) as Proyecto
-      console.log(DataProyecto.departamento,'DataProyecto');
-      console.log(Proyectos,'Proyectos');
-      DataQuery();
-      setDataList({ ...dataList, proyecto: id as string,departamento: DataProyecto.departamento});
+      console.log(id);
+      if (Proyectos.length) {
+        const DataProyecto = Proyectos.find((ele) => ele.id == id) as Proyecto;
+        if (DataProyecto) {
+          DataQuery();
+          setDataList({ ...dataList, proyecto: id as string, departamento: DataProyecto.departamento });
+        }
+      }
     }
     return () => {
       setList([]);
       setTaskList([]);
-      setProyecto(initialCreateProyecto)
+      setProyecto(initialCreateProyecto);
     };
-  }, [id]);
+  }, [id, Proyectos]);
 
   return (
     <ScreenContainer>
       <h1 className=" text-4xl font-bold mb-4">Tareas</h1>
       <div className="">
         {!List.length ? (
-          <p>No tienes Proyectos creados</p>
+          <p>No tienes Listas creadas</p>
         ) : (
           <ReactSortable
             list={List}
