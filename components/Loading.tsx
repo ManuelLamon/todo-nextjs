@@ -1,9 +1,14 @@
-import React, { useContext } from "react";
+import React, { useContext,useEffect } from "react";
 import { RenderContext } from "../context/render/renderContext";
 
 function Loading() {
 
   const { loader } = useContext(RenderContext);
+
+  useEffect(() => {
+    console.log(loader);
+  }, [loader])
+  
 
   return (
     <>

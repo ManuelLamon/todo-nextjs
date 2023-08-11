@@ -31,8 +31,8 @@ function CardProyect({ proyect }: Props) {
       href={`proyectos/${proyect.id}`}
       className="card w-full h-full shadow-xl image-full hover:scale-105 focus:scale-95 transition-all"
     >
-      <figure className="w-full">{Url ? <Image src={Url} alt={"setso"} fill className="static" /> : null}</figure>
-      <div className="card-body text-white break-words break-all">
+      <figure className="w-full">{Url ? <img src={Url} alt={"setso"} className="static object-fill w-full" /> : null}</figure>
+      <div className="card-body text-white break-words break-all p-3">
         <h2 className="card-title">{proyect.name}</h2>
         {proyect.description}
       </div>

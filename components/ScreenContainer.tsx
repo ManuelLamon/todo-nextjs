@@ -10,7 +10,7 @@ interface Props {
 
 function ScreenContainer({ children }: Props) {
     const {sesion, setSesion} = useContext(sesionContext)
-    const {setLoader} = useContext(RenderContext)
+    const {loader,setLoader} = useContext(RenderContext)
     const router = useRouter();
   useEffect(() => {
     if(typeof document != 'undefined' ){
@@ -26,18 +26,25 @@ function ScreenContainer({ children }: Props) {
   }, [sesion]);
 
   useEffect(() => {
-    const handleStart = (url:any) => (url !== router.asPath) && setLoader(true);
-    const handleComplete = (url:any) => (url === router.asPath) && setTimeout(() =>{setLoader(false)},1000);
-
+    const handleStart = (url:any) => (url !== router.asPath) && (setLoader(true));
+    const handleComplete = (url:any) => (url === router.asPath) && setTimeout(() =>{setLoader(false)},500);
+    
     router.events.on('routeChangeStart', (url) => handleStart(url))
     router.events.on('routeChangeComplete', (url) => handleComplete(url))
     router.events.on('routeChangeError', (url) => handleComplete(url))
+
+    setTimeout(() => {
+      setLoader(false)
+    }, 1000);
     return () => {
-      router.events.on('routeChangeStart', (url) => handleStart(url))
-      router.events.on('routeChangeComplete', (url) => handleComplete(url))
-      router.events.on('routeChangeError', (url) => handleComplete(url))
+      router.events.off('routeChangeStart', (url) => handleStart(url))
+      router.events.off('routeChangeComplete', (url) => handleComplete(url))
+      router.events.off('routeChangeError', (url) => handleComplete(url))
+      setTimeout(() => {
+        setLoader(false)
+      }, 1000);
     }
-  }, [router.events]);
+  }, [loader,router.events]);
 
   return (
     <div>

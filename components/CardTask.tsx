@@ -21,17 +21,28 @@ function CardTask({ Task, updateTask, showImage }: Props) {
   };
 
   useEffect(() => {
-    if (Task.archivos.length) {
-      queryImage();
+    if (Task.foto) {
+      console.log(`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`);
     }
+
+
   }, []);
 
   return (
     <div className="card card-compact w-full bg-base-100 shadow-xl mb-3 hover:cursor-grab active:cursor-grabbing">
       <figure>
         {Task.foto && (
-          <Image
-            src={`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`}
+          /*  <Image
+             src={`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`}
+             alt={"que haces leyendo esto tonto"}
+             onClick={() => {
+               showImage(`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`);
+             }}
+             className="static cursor-pointer"
+             height={112}
+             width={150}
+           /> */
+          <img src={`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`}
             alt={"que haces leyendo esto tonto"}
             onClick={() => {
               showImage(`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`);
@@ -39,6 +50,7 @@ function CardTask({ Task, updateTask, showImage }: Props) {
             className="static cursor-pointer"
             height={112}
             width={150}
+
           />
         )}
       </figure>

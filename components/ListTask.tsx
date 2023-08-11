@@ -39,7 +39,7 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
   const [toggler, setToggler] = useState(false);
   const [Imagen, setImagen] = useState<string>("");
   const [dataTask, setDataTask] = useState<RequestCreateTask | Task>(initialCreateTaskState);
-  const { TaskList, List, setList } = useContext(proyectosContext);
+  const { TaskList, List, setList, Proyectos } = useContext(proyectosContext);
   const [TaskCopy, setTaskCopy] = useState<Task[]>([]);
 
   const onChangeData = (newState: any) => {
@@ -48,13 +48,17 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
 
   const createTask = (e: string) => {
     const list = List.find((ele) => ele.id === e) as List;
+    const projec = Proyectos.find((ele) => ele.id === list.proyecto);
+    console.log(list, 'LIST');
     const dataCopy = { ...initialCreateTaskState };
-    dataCopy.lista = list.id;
-    dataCopy.proyecto = list.proyecto;
-    dataCopy.departamento = list.departamento;
-    console.log(dataCopy, "dataCopy");
-    setDataTask(dataCopy);
-    setIsOpenCreateTask(true);
+    if(projec && list){
+      dataCopy.lista = list.id;
+      dataCopy.proyecto = list.proyecto;
+      dataCopy.departamento = projec.departamento;
+      console.log(dataCopy, "dataCopy");
+      setDataTask(dataCopy);
+      setIsOpenCreateTask(true);
+    }
   };
 
   const updateTask = (e: string) => {
@@ -182,7 +186,8 @@ function ListTask({ title = "TODO", data, setTaskSelect }: Props) {
       <ModalTask isOpen={IsOpenCreateTask} setIsOpen={setIsOpenCreateTask} data={dataTask} />
       <Modal isOpen={toggler} setIsOpen={setToggler}>
         <figure className="my-5 flex justify-center items-center">
-          <Image src={Imagen} alt={"que haces leyendo esto tonto"} className="static" fill />
+          {/* <Image src={Imagen} alt={"que haces leyendo esto tonto"} className="static" fill /> */}
+          <img src={Imagen} alt={"que haces leyendo esto tonto"} className="static object-fill" />
         </figure>
       </Modal>
     </div>

@@ -89,6 +89,7 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
     const { proyecto, departamento } = data;
     if (!data.id) {
       setValue("usuario_creador", sesion.record.id);
+      setValue("usuario_last_update",  sesion.record.id)
     }
     if (data.id) {
       setIsUpdate(true);

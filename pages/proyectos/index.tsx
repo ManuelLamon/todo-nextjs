@@ -90,7 +90,7 @@ function Index() {
     <ScreenContainer>
       <h1 className=" text-4xl font-bold mb-4">Proyectos</h1>
       <div
-        className="grid xl:grid-cols-4 md:grid-cols-2 xl:grid-rows-4 overflow-x-auto h-[95%] gap-3 w-full p-4 relative"
+        className="grid xl:grid-cols-4 md:grid-cols-2 md:grid-rows-3 overflow-x-auto h-[95%] gap-3 w-full p-4 relative"
         style={{ gridAutoRows: "100px 100px 100px" }}
       >
         {!currentItems.length ? (
