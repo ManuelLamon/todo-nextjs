@@ -6,7 +6,7 @@ import ListTask from "../../components/ListTask";
 import ScreenContainer from "../../components/ScreenContainer";
 import { ReactSortable, SortableEvent } from "react-sortablejs";
 import { proyectosContext } from "../../context/proyectos/proyectosContext";
-import { List, RequestCreateList, Task } from "../../context/proyectos/proyectosInterface";
+import { List, Proyecto, RequestCreateList, Task } from "../../context/proyectos/proyectosInterface";
 import { sesionContext } from "../../context/sesion/sesionContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -31,12 +31,26 @@ export const initialCreateListState: RequestCreateList = {
   proyecto: "",
   usuario_last_update: "",
   tipo: "",
+  departamento: "",
+};
+export const initialCreateProyecto: Proyecto = {
+  id: "",
+  collectionId: "",
+  collectionName: "",
+  created: "",
+  updated: "",
+  name: "",
+  estatus: "",
+  departamento: "",
+  description: "",
+  image: "",
 };
 
 function ProjectId() {
   const router = useRouter();
   const id = router.query.projectId;
-  const { List, setList, TaskList, setTaskList } = useContext(proyectosContext);
+  const [Proyecto, setProyecto] = useState<Proyecto>(initialCreateProyecto);
+  const { List, setList, TaskList, setTaskList, Proyectos } = useContext(proyectosContext);
   const [IsOpenCreateList, setIsOpenCreateList] = useState<boolean>(false);
   const { sesion } = useContext(sesionContext);
   const [dataList, setDataList] = useState<RequestCreateList | List>(initialCreateListState);
@@ -55,11 +69,20 @@ function ProjectId() {
   const handleTaskSelect = async (e: any, elementHtml: SortableEvent) => {
     try {
       const data = TaskList.find((ele) => ele.id === e) as Task;
+
+      if (data.lista === "z0a8eenpfs9gtqr") {
+        return;
+      }
       const dataFilter = TaskList.filter((ele) => ele.id !== e && ele.lista === elementHtml.to.id).sort(
         (a, b) => Number(a.index) - Number(b.index)
       );
       data.lista = elementHtml.to.id;
       data.index = elementHtml.newIndex as number;
+      if (elementHtml.to.id === "z0a8eenpfs9gtqr") {
+        data.death_line = new Date().toISOString();
+      }
+      console.log(elementHtml.to.id);
+
       data.usuario_last_update = sesion.record.id;
       dataFilter.splice(Number(elementHtml.newIndex), 0, data);
       const dataIndex = dataFilter.map((value, index) => ({ ...value, index: index }));
@@ -96,6 +119,7 @@ function ProjectId() {
       if (e.record.proyecto !== id) {
         return;
       }
+      console.log(e.action);
       if (e.action === "create") {
         const data: Task[] = [...TaskList];
         data.unshift(e.record as any);
@@ -145,6 +169,28 @@ function ProjectId() {
         setTaskList(data);
         return;
       }
+      if (e.action === "delete") {
+        console.log(e, "aqui");
+        const data: Task[] = TaskList.filter((ele) => ele.id != e.record.id);
+        let list = TaskList.filter((ele) => ele.lista === e.record.lista && ele.id != e.record.id);
+        const dato = list.findIndex((ele) => ele.id === e.record.id);
+        if (dato) {
+          list = list.map((value, index) => ({
+            ...value,
+            index: index,
+          }));
+        }
+        for (const ele of list) {
+          for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if (ele.id === element.id) {
+              data[i] = ele;
+            }
+          }
+        }
+        setTaskList(data);
+        return;
+      }
     });
   };
 
@@ -160,11 +206,21 @@ function ProjectId() {
       if (e.record.proyecto !== id) {
         return;
       }
+
       if (e.action === "create") {
-        const copy = [...List]
-        const ele = e.record as any
+        const copy = [...List];
+        const item = e.record as any;
+        copy.push(item);
+        setList(copy);
+        return;
+      }
+      if (e.action === "delete") {
         setList(
-          copy.push(ele)
+          List.filter((list) => {
+            if (list.id !== e.record.id) {
+              return e.record as any;
+            }
+          }).sort((a, b) => Number(a.index) - Number(b.index))
         );
         return;
       }
@@ -201,22 +257,29 @@ function ProjectId() {
 
   useEffect(() => {
     if (id) {
-      DataQuery();
-      setDataList({ ...dataList, proyecto: id as string });
+      console.log(id);
+      if (Proyectos.length) {
+        const DataProyecto = Proyectos.find((ele) => ele.id == id) as Proyecto;
+        if (DataProyecto) {
+          DataQuery();
+          setDataList({ ...dataList, proyecto: id as string, departamento: DataProyecto.departamento });
+        }
+      }
     }
     return () => {
       setList([]);
       setTaskList([]);
+      setProyecto(initialCreateProyecto);
     };
-  }, [id]);
+  }, [id, Proyectos]);
 
   return (
     <ScreenContainer>
       <h1 className=" text-4xl font-bold mb-4">Tareas</h1>
       <div className="">
-        {!List.length 
-        ? (<p>No tienes Proyectos creados</p>)   
-        : (
+        {!List.length ? (
+          <p>No tienes Listas creadas</p>
+        ) : (
           <ReactSortable
             list={List}
             setList={setList}
@@ -232,6 +295,7 @@ function ProjectId() {
         )}
       </div>
       <button
+        title="crear lista"
         data-tip="crear lista"
         onClick={() => setIsOpenCreateList(true)}
         className=" fixed z-90 bottom-4 right-5  w-16 h-16 rounded-full drop-shadow-lg flex justify-center items-center text-white text-3xl btn btn-primary tooltip tooltip-left"

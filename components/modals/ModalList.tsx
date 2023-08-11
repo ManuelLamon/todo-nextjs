@@ -25,13 +25,12 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
   const [IsUpdate, setIsUpdate] = useState<boolean>(false);
   const { sesion } = useContext(sesionContext);
   const { List, setList, TiposLista, setTiposLista } = useContext(proyectosContext);
-  const [TipoList, setTipoList] = useState<any[]>([])
+  const [TipoList, setTipoList] = useState<any[]>([]);
 
   const closeModal = () => {
     setIsOpen(false);
   };
   const {
-    register,
     handleSubmit,
     control,
     watch,
@@ -45,7 +44,8 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
   const queryTiposLista = async () => {
     try {
       const records: TipoLista[] = await PB.collection("tipo_lista").getFullList();
-      setTipoList(records)
+      console.log(records);
+      setTipoList(records);
       for (const item of List) {
         for (const tipe of records) {
           if (tipe.id !== "evcwxmojxt0dr1x") {
@@ -73,22 +73,20 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
       copy.push(records);
       setList(copy);
       setIsOpen(false);
-      
     } catch (error) {
       console.log(error);
       alert(error);
     }
   });
   useEffect(() => {
-    queryTiposLista();
     if (List.length) {
-        setValue("index", List.length.toString());
+      setValue("index", List.length.toString());
     }
   }, [List]);
 
   useEffect(() => {
-    console.log(data);
-    const { proyecto } = data;
+    console.log(data, "ModalList");
+    const { proyecto, departamento } = data;
     if (!data.id) {
       setValue("usuario_creador", sesion.record.id);
     }
@@ -97,25 +95,26 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
     }
     if (isOpen) {
       setValue("proyecto", proyecto);
+      setValue("departamento", departamento);
+      queryTiposLista();
     }
     if (!isOpen) {
       reset();
       setIsUpdate(false);
-      setTiposLista([])
+      setTiposLista([]);
     }
   }, [isOpen, data]);
+
   useEffect(() => {
-    if(watch('tipo')){
-        if(watch('tipo') !== "evcwxmojxt0dr1x"){
-            const tipo = TipoList.find( e => e.id === watch('tipo') )
-            setValue('name',tipo.name)
-        }else{
-            setValue('name','')
-        }    
+    if (watch("tipo")) {
+      if (watch("tipo") !== "evcwxmojxt0dr1x") {
+        const tipo = TipoList.find((e) => e.id === watch("tipo"));
+        setValue("name", tipo.name);
+      } else {
+        setValue("name", "");
+      }
     }
-   
-  }, [watch('tipo')])
-  
+  }, [watch("tipo")]);
 
   return (
     <Modal
@@ -144,19 +143,25 @@ function ModalList({ data, isOpen, setIsOpen }: Props) {
             className="card-body flex flex-col gap-3 w-full justify-start items-center"
             onSubmit={onSubmitData}
           >
-            <div className="w-full">
+            <div
+              className={
+                watch("tipo") !== "evcwxmojxt0dr1x"
+                  ? "w-full animate__animated animate__faster animate__fadeOut"
+                  : "w-full animate__animated animate__faster  animate__fadeIn"
+              }
+            >
               <Controller
                 name="name"
                 key={"name"}
                 control={control}
-                rules={{ required: watch('tipo') === "evcwxmojxt0dr1x" }}
+                rules={{ required: watch("tipo") === "evcwxmojxt0dr1x" }}
                 render={({ field }) => (
                   <TextField
                     id="titulo-input"
                     label="Titulo"
                     variant="outlined"
                     className="w-full"
-                    disabled={ watch('tipo') !== "evcwxmojxt0dr1x"}
+                    disabled={watch("tipo") !== "evcwxmojxt0dr1x"}
                     inputProps={{
                       className: "border-transparent focus:border-transparent focus:ring-0 ",
                       maxLength: "30",

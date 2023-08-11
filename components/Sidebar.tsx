@@ -57,6 +57,8 @@ export default function Sidebar() {
         <div className="sticky inset-x-0 bottom-0 border-t border-gray-100 bg-white p-2">
           <div>
             <button
+              type="button"
+              title="logout"
               onClick={() => closeSesion()}
               className="group relative flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
             >

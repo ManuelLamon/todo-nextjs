@@ -3,6 +3,7 @@ import { PB } from "../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { Task } from "../context/proyectos/proyectosInterface";
+import Image from "next/image";
 
 interface Props {
   Task: Task;
@@ -29,12 +30,15 @@ function CardTask({ Task, updateTask, showImage }: Props) {
     <div className="card card-compact w-full bg-base-100 shadow-xl mb-3 hover:cursor-grab active:cursor-grabbing">
       <figure>
         {Task.foto && (
-          <img
+          <Image
             src={`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`}
+            alt={"que haces leyendo esto tonto"}
             onClick={() => {
               showImage(`${process.env.API}/api/files/vnqo14u55d0vubr/${Task.id}/${Task.foto}`);
             }}
-            className="cursor-pointer h-28"
+            className="static cursor-pointer"
+            height={112}
+            width={150}
           />
         )}
       </figure>
@@ -44,9 +48,11 @@ function CardTask({ Task, updateTask, showImage }: Props) {
           {Task.descripcion.length > 80 ? `${Task.descripcion.slice(0, 80)}...` : Task.descripcion}
         </div>
         <div className="card-actions justify-end">
-          <button onClick={() => updateTask(Task.id)} className="btn btn-sm btn-primary">
-            <FontAwesomeIcon icon={faPen} size={"xl"} />
-          </button>
+          {Task.lista !== "z0a8eenpfs9gtqr" ? (
+            <button onClick={() => updateTask(Task.id)} className="btn btn-sm btn-primary">
+              <FontAwesomeIcon icon={faPen} size={"xl"} />
+            </button>
+          ) : null}
         </div>
       </div>
     </div>

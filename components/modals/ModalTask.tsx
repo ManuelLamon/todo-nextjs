@@ -34,10 +34,11 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
   const [IsUpdate, setIsUpdate] = useState<boolean>(false);
   const [FileShow, setFileShow] = useState<string>("");
   const [File, setFile] = useState<File | null>(null);
+
   const consultarUsuario = async (depa: string) => {
-    console.log(data.departamento,'aqui');
-    const query = await PB.collection("users").getFullList(200,{
-      expand:`departamento="${data.departamento}"`
+    console.log(data.departamento, "aqui");
+    const query = await PB.collection("users").getFullList(200, {
+      expand: `departamento="${data.departamento}"`,
     });
     const copy = query
       .filter((e) => {
@@ -50,7 +51,6 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
   };
 
   const {
-    register,
     handleSubmit,
     control,
     watch,
@@ -69,45 +69,44 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
     try {
       console.log(formInfo);
       let formData;
-      const datos = Object.keys({...initialCreateTaskState})
-      if(File){
-        formData = new FormData()
+      const datos = Object.keys({ ...initialCreateTaskState });
+      if (File) {
+        formData = new FormData();
         for (const key in data) {
-          if(datos.includes(key) && key !== 'foto'){
-            console.log(key,formInfo[key as keyof RequestCreateTask]);
-            formData.append(key,(formInfo[key as keyof RequestCreateTask]))
+          if (datos.includes(key) && key !== "foto") {
+            console.log(key, formInfo[key as keyof RequestCreateTask]);
+            formData.append(key, formInfo[key as keyof RequestCreateTask]);
           }
-          
+
           /* if (Object.prototype.hasOwnProperty.call(data, key)) {
             const element = data[key];
             
           } */
         }
-        formData.append('foto',(File as File))
-        formData.get('foto')
-      }else{
-        formData = formInfo
+        formData.append("foto", File as File);
+        formData.get("foto");
+      } else {
+        formData = formInfo;
       }
 
       if (!data.id) {
-        console.log(data.id)
-        console.log('crear')
-        const record:Task = await PB.collection('tareas').create(formData)
-        handleTaskSelect(record)
-      }else{
-        console.log('actualizar',data.id)
-       const record = await PB.collection('tareas').update(data.id,formData)
+        console.log(data.id);
+        console.log("crear");
+        const record: Task = await PB.collection("tareas").create(formData);
+        handleTaskSelect(record);
+      } else {
+        console.log("actualizar", data.id);
+        const record = await PB.collection("tareas").update(data.id, formData);
         const tareas: Task[] = TaskList.map((task) => {
           if (task.id === data.id) {
             return record as any;
           }
           return task;
         });
-        setTaskList(tareas)
+        setTaskList(tareas);
       }
 
-      setIsOpen(false)
-
+      setIsOpen(false);
     } catch (error) {
       console.log(error);
       alert(error);
@@ -141,15 +140,15 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
 
   const handleTaskSelect = async (e: Task) => {
     try {
-      const dataFilter = TaskList.filter((ele) => ele.lista === e.lista)
-      dataFilter.unshift(e)
+      const dataFilter = TaskList.filter((ele) => ele.lista === e.lista);
+      dataFilter.unshift(e);
       const dataIndex = dataFilter.map((value, index) => ({ ...value, index: index }));
       for (const element of dataIndex) {
         element.usuario_last_update = sesion.record.id;
         await PB.collection("tareas").update(element.id, element);
       }
-      let copy = [...TaskList]
-      copy.unshift(e)
+      let copy = [...TaskList];
+      copy.unshift(e);
       for (const ele of dataIndex) {
         for (let i = 0; i < copy.length; i++) {
           if (copy[i].id === ele.id) {
@@ -157,21 +156,30 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
           }
         }
       }
-      setTaskList(copy)
+      setTaskList(copy);
     } catch (error) {
       alert(error);
     }
   };
 
-  useEffect(() => { 
-    consultarUsuario(watch('departamento'));
-  }, [watch('departamento')]);
-
-  
   useEffect(() => {
-    const { usuario_responsable, proyecto, lista, index, usuario_creador, descripcion, titulo, fecha_fin, fecha_init,departamento } =
-      data;
-      console.log(data,'la data');
+    consultarUsuario(watch("departamento"));
+  }, [watch("departamento")]);
+
+  useEffect(() => {
+    const {
+      usuario_responsable,
+      proyecto,
+      lista,
+      index,
+      usuario_creador,
+      descripcion,
+      titulo,
+      fecha_fin,
+      fecha_init,
+      departamento,
+    } = data;
+    console.log(data, "la data");
     if (!data.id) {
       setValue("proyecto", proyecto);
       setValue("lista", lista);
@@ -192,8 +200,7 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
       setValue("fecha_fin", fecha_fin as string);
       setValue("fecha_init", fecha_init as string);
       setValue("departamento", departamento);
-
-    } 
+    }
     if (!isOpen) {
       setUsuarios([]);
       reset();
@@ -243,11 +250,11 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
           )}
 
           {(data as Task).foto && !FileShow && (
-            <div {...getRootProps( {className:'h-1/2 mb-4'})}>
+            <div {...getRootProps({ className: "h-1/2 mb-4" })}>
               <figure className="my-5 rounded-lg h-full relative">
                 <div className="absolute opacity-0 hover:opacity-50 w-full h-full flex items-end cursor-pointer transition-all ease-in-out duration-300">
                   <div className="w-full h-full bg-black flex justify-center items-center">
-                  <FontAwesomeIcon icon={faPen}/>
+                    <FontAwesomeIcon icon={faPen} />
                   </div>
                 </div>
                 <img
@@ -280,7 +287,10 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
                     label="Titulo"
                     variant="outlined"
                     className="w-full"
-                    inputProps={{ className: "border-transparent focus:border-transparent focus:ring-0 " , maxLength:"30"}}
+                    inputProps={{
+                      className: "border-transparent focus:border-transparent focus:ring-0 ",
+                      maxLength: "30",
+                    }}
                     {...field}
                     error={errors.titulo ? true : false}
                     helperText={errors.titulo && "Este campo es requerido"}
@@ -302,7 +312,7 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
                     multiline
                     rows={4}
                     className="w-full focus:border-0"
-                    inputProps={{ className: "border-transparent focus:border-transparent focus:ring-0 "}}
+                    inputProps={{ className: "border-transparent focus:border-transparent focus:ring-0 " }}
                     {...field}
                     error={errors.descripcion ? true : false}
                     helperText={errors.descripcion && "Este campo es requerido"}
@@ -311,32 +321,32 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
               />
             </div>
             <div className="w-full flex gap-3">
+              <Controller
+                name="usuario_responsable"
+                key={"usuario_responsable"}
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">Responsable</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Responsable"
+                      disabled={IsUpdate}
+                      className="w-full"
+                      {...field}
+                    >
+                      {Usuarios.map((e, index) => (
+                        <MenuItem key={index} value={e.id}>
+                          {e.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+              />
+            </div>
 
-                <Controller
-                  name="usuario_responsable"
-                  key={"usuario_responsable"}
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">Responsable</InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Responsable"
-                        className="w-full"
-                        {...field}
-                      >
-                        {Usuarios.map((e, index) => (
-                          <MenuItem key={index} value={e.id}>
-                            {e.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                />
-              </div>
-              
             <div className="w-full flex gap-3">
               <div className="w-1/2">
                 <Controller
@@ -375,10 +385,7 @@ function ModalTask({ data, isOpen, setIsOpen }: Props) {
             </div>
             <div className="h-1/6 flex gap-4 justify-end items-end ">
               <button className="btn btn-primary font-bold" type="submit">
-                Enviar
-              </button>
-              <button className="btn btn-error font-bold" type="submit">
-                Eliminar
+                {!IsUpdate ? "Enviar" : "Actualizar"}
               </button>
             </div>
           </form>
