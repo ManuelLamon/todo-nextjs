@@ -93,6 +93,9 @@ function ProjectId() {
       if (e.record.usuario_last_update === sesion.record.id) {
         return;
       }
+      if (e.record.proyecto !== id) {
+        return;
+      }
       if (e.action === "create") {
         const data: Task[] = [...TaskList];
         data.unshift(e.record as any);
@@ -152,6 +155,17 @@ function ProjectId() {
   const subList = () => {
     PB.collection("listas").subscribe("*", function (e) {
       if (e.record.usuario_last_update === sesion.record.id) {
+        return;
+      }
+      if (e.record.proyecto !== id) {
+        return;
+      }
+      if (e.action === "create") {
+        const copy = [...List]
+        const ele = e.record as any
+        setList(
+          copy.push(ele)
+        );
         return;
       }
       if (e.action === "update") {

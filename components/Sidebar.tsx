@@ -28,7 +28,8 @@ export default function Sidebar() {
                 ) : (
                   <img
                     alt="User Image"
-                    src={`${process.env.API}/api/files/_pb_users_auth_/7txrykdbnrwtsrp/${sesion.record.avatar}`}
+                    className="rounded-lg h-10 w-10 object-cover"
+                    src={`${process.env.API}/api/files/_pb_users_auth_/${sesion.record.id}/${sesion.record.avatar}`}
                     width={40}
                     height={40}
                   ></img>
